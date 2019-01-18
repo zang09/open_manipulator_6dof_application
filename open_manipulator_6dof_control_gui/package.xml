@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>open_manipulator_6dof_control_gui</name>
+  <version>1.0.0</version>
+  <description>
+    OpenManipulator 6DOF GUI control package based on QT
+  </description>
+  <license>Apache 2.0</license>
+  <maintainer email="zang09@naver.com">Hae-bum Jung</maintainer>
+  <url type="repository">https://github.com/zang09/open_manipulator_6DOF_application.git</url>
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>roscpp</depend>
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>open_manipulator_msgs</depend>
+  <depend>robotis_manipulator</depend>
+
+  <depend>qtbase5-dev</depend>
+  <depend>qt5-qmake</depend>
+  <depend>libqt5-core</depend>
+  <depend>libqt5-gui</depend>
+</package>
