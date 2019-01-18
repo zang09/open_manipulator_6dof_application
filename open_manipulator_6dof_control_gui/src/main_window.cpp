@@ -17,7 +17,7 @@
 /* Authors: Darby Lim, Hye-Jong KIM, Ryan Shim, Yong-Ho Na */
 
 /***********************************************************
-** Modify: Hae-Bum JUNG
+** Modified by Hae-Bum Jung
 ************************************************************/
 
 /*****************************************************************************
@@ -222,10 +222,10 @@ void MainWindow::on_btn_home_pose_clicked(void)
     double path_time = 2.0;
 
     joint_name.push_back("joint1"); joint_angle.push_back(0.0);
-    joint_name.push_back("joint2"); joint_angle.push_back(-45.0*D2R);
-    joint_name.push_back("joint3"); joint_angle.push_back(90.0*D2R);
+    joint_name.push_back("joint2"); joint_angle.push_back(-0.78);
+    joint_name.push_back("joint3"); joint_angle.push_back(1.5);
     joint_name.push_back("joint4"); joint_angle.push_back(0.0);
-    joint_name.push_back("joint5"); joint_angle.push_back(45.0*D2R);
+    joint_name.push_back("joint5"); joint_angle.push_back(0.8);
     joint_name.push_back("joint6"); joint_angle.push_back(0.0);
 
     if(!qnode.setJointSpacePath(joint_name, joint_angle, path_time))
@@ -262,7 +262,6 @@ void MainWindow::on_btn_gripper_close_clicked(void)
 
     writeLog("Send gripper close");
 }
-
 
 void MainWindow::on_btn_read_joint_angle_clicked(void)
 {
@@ -311,7 +310,7 @@ void MainWindow::on_btn_read_kinematic_pose_clicked(void)
     ui.doubleSpinBox_pitch->setValue(orientation_rpy.coeffRef(1,0));
     ui.doubleSpinBox_yaw->setValue(orientation_rpy.coeffRef(2,0));
 
-    writeLog("Read task pose");
+    writeLog("Read kinematic_pose");
 }
 void MainWindow::on_btn_send_kinematic_pose_clicked(void)
 {
@@ -334,7 +333,7 @@ void MainWindow::on_btn_send_kinematic_pose_clicked(void)
         return;
     }
 
-    writeLog("Send task pose");
+    writeLog("Send kinematic_pose");
 }
 void MainWindow::on_btn_set_gripper_clicked(void)
 {
@@ -423,6 +422,136 @@ void MainWindow::on_btn_send_drawing_trajectory_clicked(void)
         return;
     }
     writeLog("Send drawing trajectory");
+}
+
+void MainWindow::on_btn_control_up_clicked(void)
+{
+    std::vector<double> goal_pose;    goal_pose.resize(7, 0.0);
+    goal_pose.at(2) = DELTA;
+    qnode.setTaskSpacePathFromPresent(goal_pose, PATH_TIME);
+    writeLog("Send Up");
+}
+void MainWindow::on_btn_control_down_clicked(void)
+{
+    std::vector<double> goal_pose;    goal_pose.resize(7, 0.0);
+    goal_pose.at(2) = -DELTA;
+    qnode.setTaskSpacePathFromPresent(goal_pose, PATH_TIME);
+    writeLog("Send Down");
+}
+void MainWindow::on_btn_control_left_clicked(void)
+{
+    std::vector<double> goal_pose;    goal_pose.resize(7, 0.0);
+    goal_pose.at(1) = -DELTA;
+    qnode.setTaskSpacePathFromPresent(goal_pose, PATH_TIME);
+    writeLog("Send Left");
+}
+void MainWindow::on_btn_control_right_clicked(void)
+{
+    std::vector<double> goal_pose;    goal_pose.resize(7, 0.0);
+    goal_pose.at(1) = DELTA;
+    qnode.setTaskSpacePathFromPresent(goal_pose, PATH_TIME);
+    writeLog("Send Right");
+}
+void MainWindow::on_btn_control_fwd_clicked(void)
+{
+    std::vector<double> goal_pose;    goal_pose.resize(7, 0.0);
+    goal_pose.at(0) = DELTA;
+    qnode.setTaskSpacePathFromPresent(goal_pose, PATH_TIME);
+    writeLog("Send Forward");
+}
+void MainWindow::on_btn_control_back_clicked(void)
+{
+    std::vector<double> goal_pose;    goal_pose.resize(7, 0.0);
+    goal_pose.at(0) = -DELTA;
+    qnode.setTaskSpacePathFromPresent(goal_pose, PATH_TIME);
+    writeLog("Send Back");
+}
+void MainWindow::on_btn_control_init_pos_clicked(void)
+{
+    std::vector<double> kinematics_pose;
+    kinematics_pose.push_back(0.16);   //x
+    kinematics_pose.push_back(0.0);    //y
+    kinematics_pose.push_back(0.25);   //z
+    qnode.setTaskSpacePathPositionOnly(kinematics_pose, 2.0);
+    writeLog("Send Init");
+}
+
+void MainWindow::on_btn_control_p_pitch_clicked(void)
+{
+    std::vector<double> goal_pose;    goal_pose.resize(7, 0.0);
+    Eigen::Quaterniond temp_orientation = RM_MATH::convertRPYToQuaternion(0.0,DELTA_ORI,0.0);
+    goal_pose.at(3) = temp_orientation.w();
+    goal_pose.at(4) = temp_orientation.x();
+    goal_pose.at(5) = temp_orientation.y();
+    goal_pose.at(6) = temp_orientation.z();
+    qnode.setTaskSpacePathFromPresent(goal_pose, PATH_TIME);
+    writeLog("Send Plus Pitch");
+}
+void MainWindow::on_btn_control_m_pitch_clicked(void)
+{
+    std::vector<double> goal_pose;    goal_pose.resize(7, 0.0);
+    Eigen::Quaterniond temp_orientation = RM_MATH::convertRPYToQuaternion(0.0,-DELTA_ORI,0.0);
+    goal_pose.at(3) = temp_orientation.w();
+    goal_pose.at(4) = temp_orientation.x();
+    goal_pose.at(5) = temp_orientation.y();
+    goal_pose.at(6) = temp_orientation.z();
+    qnode.setTaskSpacePathFromPresent(goal_pose, PATH_TIME);
+    writeLog("Send Minus Pitch");
+}
+void MainWindow::on_btn_control_p_roll_clicked(void)
+{
+    std::vector<double> goal_pose;    goal_pose.resize(7, 0.0);
+    Eigen::Quaterniond temp_orientation = RM_MATH::convertRPYToQuaternion(DELTA_ORI,0.0,0.0);
+    goal_pose.at(3) = temp_orientation.w();
+    goal_pose.at(4) = temp_orientation.x();
+    goal_pose.at(5) = temp_orientation.y();
+    goal_pose.at(6) = temp_orientation.z();
+    qnode.setTaskSpacePathFromPresent(goal_pose, PATH_TIME);
+    writeLog("Send Plus Roll");
+}
+void MainWindow::on_btn_control_m_roll_clicked(void)
+{
+    std::vector<double> goal_pose;    goal_pose.resize(7, 0.0);
+    Eigen::Quaterniond temp_orientation = RM_MATH::convertRPYToQuaternion(-DELTA_ORI,0.0,0.0);
+    goal_pose.at(3) = temp_orientation.w();
+    goal_pose.at(4) = temp_orientation.x();
+    goal_pose.at(5) = temp_orientation.y();
+    goal_pose.at(6) = temp_orientation.z();
+    qnode.setTaskSpacePathFromPresent(goal_pose, PATH_TIME);
+    writeLog("Send Minus Roll");
+}
+void MainWindow::on_btn_control_p_yaw_clicked(void)
+{
+    std::vector<double> goal_pose;    goal_pose.resize(7, 0.0);
+    Eigen::Quaterniond temp_orientation = RM_MATH::convertRPYToQuaternion(0.0,0.0,-0.03);
+    goal_pose.at(3) = temp_orientation.w();
+    goal_pose.at(4) = temp_orientation.x();
+    goal_pose.at(5) = temp_orientation.y();
+    goal_pose.at(6) = temp_orientation.z();
+    qnode.setTaskSpacePathFromPresent(goal_pose, PATH_TIME);
+    writeLog("Send Plus Yaw");
+}
+void MainWindow::on_btn_control_m_yaw_clicked(void)
+{
+    std::vector<double> goal_pose;    goal_pose.resize(7, 0.0);
+    Eigen::Quaterniond temp_orientation = RM_MATH::convertRPYToQuaternion(0.0,0.0,0.03);
+    goal_pose.at(3) = temp_orientation.w();
+    goal_pose.at(4) = temp_orientation.x();
+    goal_pose.at(5) = temp_orientation.y();
+    goal_pose.at(6) = temp_orientation.z();
+    qnode.setTaskSpacePathFromPresent(goal_pose, PATH_TIME);
+    writeLog("Send Minus Yaw");
+}
+void MainWindow::on_btn_control_init_ori_clicked(void)
+{
+    std::vector<double> orientation_pose;
+    Eigen::Quaterniond temp_orientation = RM_MATH::convertRPYToQuaternion(-0.695,1.55,-0.7);
+    orientation_pose.push_back(temp_orientation.w());
+    orientation_pose.push_back(temp_orientation.x());
+    orientation_pose.push_back(temp_orientation.y());
+    orientation_pose.push_back(temp_orientation.z());
+    qnode.setTaskSpacePathOrientationOnly(orientation_pose, PATH_TIME);
+    writeLog("Send Init");
 }
 
 void MainWindow::on_btn_pick_clicked(void)  //callback

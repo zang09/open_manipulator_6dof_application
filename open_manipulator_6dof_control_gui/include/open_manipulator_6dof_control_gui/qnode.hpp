@@ -17,7 +17,7 @@
 /* Authors: Darby Lim, Hye-Jong KIM, Ryan Shim, Yong-Ho Na */
 
 /***********************************************************
-** Modify: Hae-Bum JUNG
+** Modified by Hae-Bum Jung
 ************************************************************/
 
 /*****************************************************************************
@@ -98,6 +98,9 @@ public:
   void setMotionLocation(std::vector<double> kinematics_pose, double path_time, std::vector<double> joint_angle);
   bool setJointSpacePath(std::vector<std::string> joint_name, std::vector<double> joint_angle, double path_time);
   bool setJointSpacePathToKinematicsPose(std::vector<double> kinematics_pose, double path_time);
+  bool setTaskSpacePathPositionOnly(std::vector<double> kinematics_pose, double path_time);
+  bool setTaskSpacePathOrientationOnly(std::vector<double> kinematics_pose, double path_time);
+  bool setTaskSpacePathFromPresent(std::vector<double> kinematics_pose, double path_time);
   bool setDrawingTrajectory(std::string name, std::vector<double> arg, double path_time);
   bool setToolControl(std::vector<double> joint_angle);
   bool setActuatorState(bool actuator_state);
@@ -118,8 +121,9 @@ private:
 
   ros::ServiceClient goal_joint_space_path_client_;
   ros::ServiceClient goal_joint_space_path_to_kinematics_pose_client_;
-  ros::ServiceClient goal_task_space_path_client_;
+  //ros::ServiceClient goal_task_space_path_client_;
   ros::ServiceClient goal_task_space_path_position_only_client_;
+  ros::ServiceClient goal_task_space_path_orientation_only_client_;
   ros::ServiceClient goal_task_space_path_from_present_client_;
   ros::ServiceClient goal_tool_control_client_;
   ros::ServiceClient set_actuator_state_client_;

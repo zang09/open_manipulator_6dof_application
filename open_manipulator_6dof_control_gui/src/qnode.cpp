@@ -17,7 +17,7 @@
 /* Authors: Darby Lim, Hye-Jong KIM, Ryan Shim, Yong-Ho Na */
 
 /***********************************************************
-** Modify: Hae-Bum JUNG
+** Modified by Hae-Bum Jung
 ************************************************************/
 
 /*****************************************************************************
@@ -76,8 +76,9 @@ bool QNode::init() {
 
     goal_joint_space_path_to_kinematics_pose_client_ = n.serviceClient<open_manipulator_msgs::SetKinematicsPose>("goal_joint_space_path_to_kinematics_pose");
 
-    goal_task_space_path_client_               = n.serviceClient<open_manipulator_msgs::SetKinematicsPose>("goal_task_space_path");
-    //goal_task_space_path_position_only_client_ = n.serviceClient<open_manipulator_msgs::SetKinematicsPose>("goal_task_space_path_position_only");
+    //goal_task_space_path_client_               = n.serviceClient<open_manipulator_msgs::SetKinematicsPose>("goal_task_space_path");
+    goal_task_space_path_position_only_client_   = n.serviceClient<open_manipulator_msgs::SetKinematicsPose>("goal_task_space_path_position_only");
+    goal_task_space_path_orientation_only_client_= n.serviceClient<open_manipulator_msgs::SetKinematicsPose>("goal_task_space_path_orientation_only");
     goal_task_space_path_from_present_client_    = n.serviceClient<open_manipulator_msgs::SetKinematicsPose>("goal_task_space_path_from_present");
 
     goal_tool_control_client_       = n.serviceClient<open_manipulator_msgs::SetJointPosition>("goal_tool_control");
@@ -227,6 +228,72 @@ bool QNode::setJointSpacePathToKinematicsPose(std::vector<double> kinematics_pos
     srv.request.path_time = path_time;
 
     if(goal_joint_space_path_to_kinematics_pose_client_.call(srv))
+    {
+        return srv.response.is_planned;
+    }
+    return false;
+}
+
+bool QNode::setTaskSpacePathPositionOnly(std::vector<double> kinematics_pose, double path_time)
+{
+    open_manipulator_msgs::SetKinematicsPose srv;
+
+    srv.request.end_effector_name = "gripper";
+    srv.request.kinematics_pose.pose.position.x = kinematics_pose.at(0);
+    srv.request.kinematics_pose.pose.position.y = kinematics_pose.at(1);
+    srv.request.kinematics_pose.pose.position.z = kinematics_pose.at(2);
+
+    srv.request.path_time = path_time;
+
+    if(goal_task_space_path_position_only_client_.call(srv))
+    {
+        return srv.response.is_planned;
+    }
+    return false;
+}
+
+bool QNode::setTaskSpacePathOrientationOnly(std::vector<double> kinematics_pose, double path_time)
+{
+    open_manipulator_msgs::SetKinematicsPose srv;
+
+    srv.request.end_effector_name = "gripper";
+    srv.request.kinematics_pose.pose.orientation.w = kinematics_pose.at(0);
+    srv.request.kinematics_pose.pose.orientation.x = kinematics_pose.at(1);
+    srv.request.kinematics_pose.pose.orientation.y = kinematics_pose.at(2);
+    srv.request.kinematics_pose.pose.orientation.z = kinematics_pose.at(3);
+
+    srv.request.path_time = path_time;
+
+    if(goal_task_space_path_orientation_only_client_.call(srv))
+    {
+        return srv.response.is_planned;
+    }
+    return false;
+}
+
+bool QNode::setTaskSpacePathFromPresent(std::vector<double> kinematics_pose, double path_time)
+{
+    open_manipulator_msgs::SetKinematicsPose srv;
+
+    for(int i=0; i<7; i++)
+    {
+        std::cout << "value" << 1 + i << ": " << kinematics_pose.at(i) << std::endl;
+    }
+    std::cout << "path_time: " << path_time << std::endl;
+
+    srv.request.planning_group = "gripper";
+    srv.request.kinematics_pose.pose.position.x = kinematics_pose.at(0);
+    srv.request.kinematics_pose.pose.position.y = kinematics_pose.at(1);
+    srv.request.kinematics_pose.pose.position.z = kinematics_pose.at(2);
+
+    srv.request.kinematics_pose.pose.orientation.w = kinematics_pose.at(3); //kinematics_pose_.pose.orientation.w;
+    srv.request.kinematics_pose.pose.orientation.x = kinematics_pose.at(4); //kinematics_pose_.pose.orientation.x;
+    srv.request.kinematics_pose.pose.orientation.y = kinematics_pose.at(5); //kinematics_pose_.pose.orientation.y;
+    srv.request.kinematics_pose.pose.orientation.z = kinematics_pose.at(6); //kinematics_pose_.pose.orientation.z;
+
+    srv.request.path_time = path_time;
+
+    if(goal_task_space_path_from_present_client_.call(srv))
     {
         return srv.response.is_planned;
     }

@@ -14,7 +14,7 @@
    <string>OpenManipulator control GUI</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../resources/images.qrc">
+   <iconset resource="../../../dynamixel-workbench/dynamixel_workbench_single_manager_gui/resources/images.qrc">
     <normaloff>:/images/icon.png</normaloff>:/images/icon.png</iconset>
   </property>
   <property name="locale">
@@ -493,14 +493,14 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>425</x>
+      <x>424</x>
       <y>404</y>
       <width>391</width>
       <height>221</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab_js">
      <attribute name="title">
@@ -1309,6 +1309,211 @@
      <zorder>label_35</zorder>
      <zorder>doubleSpinBox_time_cs</zorder>
      <zorder>label_36</zorder>
+    </widget>
+    <widget class="QWidget" name="tab_controller">
+     <attribute name="title">
+      <string>Task space</string>
+     </attribute>
+     <widget class="QPushButton" name="btn_control_up">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>10</y>
+        <width>50</width>
+        <height>50</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>UP</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_control_down">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>120</y>
+        <width>50</width>
+        <height>50</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>DOWN</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_control_right">
+      <property name="geometry">
+       <rect>
+        <x>125</x>
+        <y>65</y>
+        <width>50</width>
+        <height>50</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>RIGTH</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_control_left">
+      <property name="geometry">
+       <rect>
+        <x>15</x>
+        <y>65</y>
+        <width>50</width>
+        <height>50</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>LEFT</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_control_back">
+      <property name="geometry">
+       <rect>
+        <x>125</x>
+        <y>120</y>
+        <width>50</width>
+        <height>50</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>BACK</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_control_fwd">
+      <property name="geometry">
+       <rect>
+        <x>15</x>
+        <y>120</y>
+        <width>50</width>
+        <height>50</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string notr="true">FWD</string>
+      </property>
+      <property name="checkable">
+       <bool>false</bool>
+      </property>
+      <property name="autoRepeat">
+       <bool>false</bool>
+      </property>
+      <property name="autoExclusive">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_control_init_pos">
+      <property name="geometry">
+       <rect>
+        <x>75</x>
+        <y>70</y>
+        <width>40</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>INIT</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_control_init_ori">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>70</y>
+        <width>40</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>INIT</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_control_p_yaw">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>120</y>
+        <width>50</width>
+        <height>50</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>+YAW</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_control_p_roll">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>65</y>
+        <width>50</width>
+        <height>50</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>+ROLL</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_control_m_pitch">
+      <property name="geometry">
+       <rect>
+        <x>265</x>
+        <y>10</y>
+        <width>50</width>
+        <height>50</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>-PITCH</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_control_p_pitch">
+      <property name="geometry">
+       <rect>
+        <x>265</x>
+        <y>120</y>
+        <width>50</width>
+        <height>50</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>+PITCH</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_control_m_yaw">
+      <property name="geometry">
+       <rect>
+        <x>210</x>
+        <y>120</y>
+        <width>50</width>
+        <height>50</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string notr="true">-YAW</string>
+      </property>
+      <property name="checkable">
+       <bool>false</bool>
+      </property>
+      <property name="autoRepeat">
+       <bool>false</bool>
+      </property>
+      <property name="autoExclusive">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_control_m_roll">
+      <property name="geometry">
+       <rect>
+        <x>210</x>
+        <y>65</y>
+        <width>50</width>
+        <height>50</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>-ROLL</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_drawing">
      <attribute name="title">
@@ -2271,7 +2476,7 @@
   </action>
  </widget>
  <resources>
-  <include location="../resources/images.qrc"/>
+  <include location="../../../dynamixel-workbench/dynamixel_workbench_single_manager_gui/resources/images.qrc"/>
  </resources>
  <connections>
   <connection>
