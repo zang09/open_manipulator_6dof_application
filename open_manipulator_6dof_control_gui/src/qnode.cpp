@@ -28,6 +28,7 @@
 #include <ros/network.h>
 #include <string>
 #include <std_msgs/String.h>
+#include <std_msgs/Bool.h>
 #include <sstream>
 #include "../include/open_manipulator_6dof_control_gui/qnode.hpp"
 #include "../include/open_manipulator_6dof_control_gui/main_window.hpp"
@@ -67,6 +68,7 @@ bool QNode::init() {
 
     // msg publisher
     open_manipulator_option_pub_ = n.advertise<std_msgs::String>("option", 10);
+    open_manipulator_gui_button_pub_ = n.advertise<std_msgs::Bool>("button_clicked", 1);
     // msg subscriber
     open_manipulator_states_sub_          = n.subscribe("states", 10, &QNode::statesCallback, this);
     open_manipulator_joint_states_sub_    = n.subscribe("joint_states", 10, &QNode::jointStatesCallback, this);
@@ -274,12 +276,6 @@ bool QNode::setTaskSpacePathOrientationOnly(std::vector<double> kinematics_pose,
 bool QNode::setTaskSpacePathFromPresent(std::vector<double> kinematics_pose, double path_time)
 {
     open_manipulator_msgs::SetKinematicsPose srv;
-
-    for(int i=0; i<7; i++)
-    {
-        std::cout << "value" << 1 + i << ": " << kinematics_pose.at(i) << std::endl;
-    }
-    std::cout << "path_time: " << path_time << std::endl;
 
     srv.request.planning_group = "gripper";
     srv.request.kinematics_pose.pose.position.x = kinematics_pose.at(0);

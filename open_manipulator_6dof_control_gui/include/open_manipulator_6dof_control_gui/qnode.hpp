@@ -114,7 +114,7 @@ private:
   QStringListModel logging_model;
 
   ros::Publisher  open_manipulator_option_pub_;
-
+  ros::Publisher  open_manipulator_gui_button_pub_;
   ros::Subscriber open_manipulator_states_sub_;
   ros::Subscriber open_manipulator_joint_states_sub_;
   ros::Subscriber open_manipulator_kinematics_pose_sub_;

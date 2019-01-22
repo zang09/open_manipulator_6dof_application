@@ -491,6 +491,9 @@
     </property>
    </widget>
    <widget class="QTabWidget" name="tabWidget">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>424</x>
@@ -500,9 +503,12 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_js">
+     <property name="contextMenuPolicy">
+      <enum>Qt::DefaultContextMenu</enum>
+     </property>
      <attribute name="title">
       <string>Joint space</string>
      </attribute>
@@ -1810,7 +1816,7 @@
      </attribute>
      <widget class="QPushButton" name="btn_get_manipulator_setting">
       <property name="enabled">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
       <property name="geometry">
        <rect>

@@ -106,6 +106,8 @@ void MainWindow::tabSelected()
         on_btn_read_joint_angle_clicked();
     if(ui.tabWidget->currentIndex()==1)
         on_btn_read_kinematic_pose_clicked();
+    if(ui.tabWidget->currentIndex()==2)
+        on_btn_home_pose_clicked();
 }
 
 void MainWindow::writeLog(QString str)
@@ -128,6 +130,7 @@ void MainWindow::on_btn_timer_start_clicked(void)
 
         writeLog("QTimer start : 100ms");
         ui.btn_timer_start->setText("Timer Stop");
+        ui.tabWidget->setEnabled(true);
         ui.btn_actuator_disable->setEnabled(true);
         ui.btn_actuator_enable->setEnabled(true);
         ui.btn_gripper_close->setEnabled(true);
@@ -149,6 +152,7 @@ void MainWindow::on_btn_timer_start_clicked(void)
 
         writeLog("QTimer stop!");
         ui.btn_timer_start->setText("Timer Start");
+        ui.tabWidget->setEnabled(false);
         ui.btn_actuator_disable->setEnabled(false);
         ui.btn_actuator_enable->setEnabled(false);
         ui.btn_gripper_close->setEnabled(false);
@@ -473,7 +477,7 @@ void MainWindow::on_btn_control_init_pos_clicked(void)
     kinematics_pose.push_back(0.0);    //y
     kinematics_pose.push_back(0.25);   //z
     qnode.setTaskSpacePathPositionOnly(kinematics_pose, 2.0);
-    writeLog("Send Init");
+    writeLog("Send Position Init");
 }
 
 void MainWindow::on_btn_control_p_pitch_clicked(void)
@@ -551,7 +555,7 @@ void MainWindow::on_btn_control_init_ori_clicked(void)
     orientation_pose.push_back(temp_orientation.y());
     orientation_pose.push_back(temp_orientation.z());
     qnode.setTaskSpacePathOrientationOnly(orientation_pose, PATH_TIME);
-    writeLog("Send Init");
+    writeLog("Send Orientation Init");
 }
 
 void MainWindow::on_btn_pick_clicked(void)  //callback
