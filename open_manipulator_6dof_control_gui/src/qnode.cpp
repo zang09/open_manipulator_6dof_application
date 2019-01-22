@@ -68,7 +68,7 @@ bool QNode::init() {
 
     // msg publisher
     open_manipulator_option_pub_ = n.advertise<std_msgs::String>("option", 10);
-    open_manipulator_gui_button_pub_ = n.advertise<std_msgs::Bool>("button_clicked", 1);
+    open_manipulator_gui_button_pub_ = n.advertise<std_msgs::Bool>("button_clicked", 10);
     // msg subscriber
     open_manipulator_states_sub_          = n.subscribe("states", 10, &QNode::statesCallback, this);
     open_manipulator_joint_states_sub_    = n.subscribe("joint_states", 10, &QNode::jointStatesCallback, this);
@@ -180,11 +180,11 @@ void QNode::setOption(std::string opt)
     open_manipulator_option_pub_.publish(msg);
 }
 
-void QNode::setMotionLocation(std::vector<double> kinematics_pose, double path_time, std::vector<double> joint_angle)
+void QNode::setButtonState(bool state)
 {
-    //setTaskSpacePath(kinematics_pose, path_time);
-    sleep(path_time);
-    setToolControl(joint_angle);
+    std_msgs::Bool msg;
+    msg.data = state;
+    open_manipulator_gui_button_pub_.publish(msg);
 }
 
 bool QNode::setJointSpacePath(std::vector<std::string> joint_name, std::vector<double> joint_angle, double path_time)

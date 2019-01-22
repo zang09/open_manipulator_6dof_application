@@ -41,6 +41,7 @@
 #include <QStringListModel>
 #include <sensor_msgs/JointState.h>
 #include <std_msgs/String.h>
+#include <std_msgs/Bool.h>
 
 #include "open_manipulator_msgs/OpenManipulatorState.h"
 #include "open_manipulator_msgs/SetJointPosition.h"
@@ -95,7 +96,7 @@ public:
   bool getOpenManipulatorActuatorState();
 
   void setOption(std::string opt);
-  void setMotionLocation(std::vector<double> kinematics_pose, double path_time, std::vector<double> joint_angle);
+  void setButtonState(bool state);
   bool setJointSpacePath(std::vector<std::string> joint_name, std::vector<double> joint_angle, double path_time);
   bool setJointSpacePathToKinematicsPose(std::vector<double> kinematics_pose, double path_time);
   bool setTaskSpacePathPositionOnly(std::vector<double> kinematics_pose, double path_time);

@@ -615,73 +615,13 @@ void MainWindow::on_btn_pick_clicked(void)  //callback
 
 void MainWindow::on_btn_multi_clicked(void)
 {
-    std::vector<std::string> joint_name;
-    std::vector<double> joint_angle1;
-    std::vector<double> joint_angle2;
-    std::vector<double> joint_angle3;
-    double path_time = 2.0;
+    bool button_state;
 
-    joint_name.push_back("joint1"); joint_angle1.push_back(0.0);
-    joint_name.push_back("joint2"); joint_angle1.push_back(-45.0*D2R);
-    joint_name.push_back("joint3"); joint_angle1.push_back(90.0*D2R);
-    joint_name.push_back("joint4"); joint_angle1.push_back(0.0);
-    joint_name.push_back("joint5"); joint_angle1.push_back(45.0*D2R);
-    joint_name.push_back("joint6"); joint_angle1.push_back(0.0);
+    button_state = true;
 
-    joint_angle2.push_back(0.01);
-    joint_angle2.push_back(-0.01);
+    qnode.setButtonState(button_state);
 
-    switch(1)
-    {
-    case 1:
-        qnode.setJointSpacePath(joint_name, joint_angle1, path_time);
-        //ROBOTIS_MANIPULATOR::RobotisManipulator::TrajectoryWait(path_time, ROBOTIS_MANIPULATOR::RobotisManipulator::getAllActiveJointValue());
-        qnode.setToolControl(joint_angle2);
-        //ROBOTIS_MANIPULATOR::RobotisManipulator::TrajectoryWait(1.0, ROBOTIS_MANIPULATOR::RobotisManipulator::getAllActiveJointValue());
-        qnode.setToolControl(joint_angle3);
-    }
-
-    /*
-     *
-     * std::vector<double> kinematics_pose1;
-    std::vector<double> joint_angle1;
-    static double path_time = 4.0;      //DEFAULT
-    kinematics_pose1.push_back(0.15);   //x
-    kinematics_pose1.push_back(-0.25);  //y
-    kinematics_pose1.push_back(0.15);   //z
-    joint_angle1.push_back(-0.01);
-
-    std::vector<double> kinematics_pose2;
-    std::vector<double> joint_angle2;
-    kinematics_pose2.push_back(0.15);   //x
-    kinematics_pose2.push_back(0.25);   //y
-    kinematics_pose2.push_back(0.15);   //z
-    joint_angle2.push_back(0.01);
-
-    std::vector<double> kinematics_pose3;
-    std::vector<double> joint_angle3;
-    kinematics_pose3.push_back(0.293);  //x
-    kinematics_pose3.push_back(0.0);    //y
-    kinematics_pose3.push_back(0.203);  //z
-
-    joint_angle3.push_back(0.01);
-
-    switch(1)
-    {
-    case 1:
-        qnode.setMotionLocation(kinematics_pose1, path_time, joint_angle1);
-    case 2:
-        motion_wait(1);
-        qnode.setMotionLocation(kinematics_pose2, 6.0, joint_angle2);
-    case 3:
-        motion_wait(1);
-        qnode.setMotionLocation(kinematics_pose3, path_time, joint_angle3);
-    default:
-        break;
-    }
-    */
-
-    writeLog("Send joint angle to Motion");
+    writeLog("Send Motion");
 }
 
 }  // namespace open_manipulator_control_gui
