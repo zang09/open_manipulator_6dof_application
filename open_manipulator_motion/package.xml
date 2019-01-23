@@ -4,7 +4,7 @@
   <version>0.0.0</version>
   <description>The open_manipulator_motion package</description>
 
-  <maintainer email="robit@todo.todo">robit</maintainer>
+  <maintainer email="zang09@naver.com">Hae-Bum Jung</maintainer>
   <license>TODO</license>
 
   <buildtool_depend>catkin</buildtool_depend>

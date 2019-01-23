@@ -19,8 +19,7 @@ using namespace open_manipulator_motion;
 
 OM_MOTION::OM_MOTION()
     :node_handle_("")
-{
-}
+{}
 
 OM_MOTION::~OM_MOTION()
 {
