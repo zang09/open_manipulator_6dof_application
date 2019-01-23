@@ -15,7 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   open_manipulator_msgs
   robotis_manipulator
-  open_manipulator_libs
+  open_manipulator_6dof_libs
   message_generation
 )
 
