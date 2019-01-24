@@ -1,1 +1,1 @@
-# open_manipulator_6DOF_application
+# open_manipulator_6dof_application
