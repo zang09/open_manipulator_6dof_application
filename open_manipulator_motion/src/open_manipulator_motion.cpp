@@ -18,50 +18,50 @@
 using namespace open_manipulator_motion;
 
 OM_MOTION::OM_MOTION()
-    :node_handle_("")
+  :node_handle_("")
 {}
 
 OM_MOTION::~OM_MOTION()
 {
-    if(ros::isStarted()) {
-        ros::shutdown(); // explicitly needed since we use ros::start();
-        ros::waitForShutdown();
-    }
-    wait();
+  if(ros::isStarted()) {
+    ros::shutdown(); // explicitly needed since we use ros::start();
+    ros::waitForShutdown();
+  }
+  wait();
 }
 
 void OM_MOTION::initPublisher()
 {
-    open_manipulator_motion_state_pub_ = node_handle_.advertise<open_manipulator_motion::MotionState>("motion_state", 10);
+  open_manipulator_motion_state_pub_ = node_handle_.advertise<open_manipulator_motion::MotionState>("motion_state", 10);
 }
 
 void OM_MOTION::initSubscriber()
 {
-    open_manipulator_gui_button_sub_ = node_handle_.subscribe("/open_manipulator_6dof/button_clicked", 10, &OM_MOTION::motionStatesCallback, this);
+  open_manipulator_gui_button_sub_ = node_handle_.subscribe("/open_manipulator_6dof/button_clicked", 10, &OM_MOTION::motionStatesCallback, this);
 }
 
 void OM_MOTION::motionStatesCallback(const std_msgs::Bool::ConstPtr& msg)
 {
-    std::cout << "Data: " << (int)msg->data << std::endl;
+  std::cout << "Data: " << (int)msg->data << std::endl;
 }
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "open_manipulator_motion");
-    ROS_INFO("OpenManipulator 6DOF Motion node");
+  ros::init(argc, argv, "open_manipulator_motion");
+  ROS_INFO("OpenManipulator 6DOF Motion node");
 
-    OM_MOTION om_motion;
+  OM_MOTION om_motion;
 
-    om_motion.initPublisher();
-    om_motion.initSubscriber();
+  om_motion.initPublisher();
+  om_motion.initSubscriber();
 
-    ros::Rate loop_rate(100);
+  ros::Rate loop_rate(100);
 
-    while (ros::ok())
-    {
-        ros::spinOnce();
-        loop_rate.sleep();
-    }
+  while (ros::ok())
+  {
+    ros::spinOnce();
+    loop_rate.sleep();
+  }
 
-    return 0;
+  return 0;
 }

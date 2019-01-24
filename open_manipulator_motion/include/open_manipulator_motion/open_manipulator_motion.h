@@ -16,22 +16,22 @@ namespace open_manipulator_motion
 class OM_MOTION
 {
 private:
-    // ROS NodeHandle
-    ros::NodeHandle node_handle_;
+  // ROS NodeHandle
+  ros::NodeHandle node_handle_;
 
-    // ROS Publisher
-    ros::Publisher open_manipulator_motion_state_pub_;
+  // ROS Publisher
+  ros::Publisher open_manipulator_motion_state_pub_;
 
-    // ROS Subscribers
-    ros::Subscriber open_manipulator_gui_button_sub_;
+  // ROS Subscribers
+  ros::Subscriber open_manipulator_gui_button_sub_;
 
 public:
-    OM_MOTION();
-    ~OM_MOTION();
+  OM_MOTION();
+  ~OM_MOTION();
 
-    void initPublisher();
-    void initSubscriber();
-    void motionStatesCallback(const std_msgs::Bool::ConstPtr &msg);
+  void initPublisher();
+  void initSubscriber();
+  void motionStatesCallback(const std_msgs::Bool::ConstPtr &msg);
 };
 }
 

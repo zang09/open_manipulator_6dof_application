@@ -63,26 +63,26 @@ namespace open_manipulator_control_gui {
 *****************************************************************************/
 
 class QNode : public QThread {
-    Q_OBJECT
+  Q_OBJECT
 public:
-	QNode(int argc, char** argv );
-	virtual ~QNode();
-	bool init();
-	void run();
+  QNode(int argc, char** argv );
+  virtual ~QNode();
+  bool init();
+  void run();
 
-	/*********************
-	** Logging
-	**********************/
-	enum LogLevel {
-	         Debug,
-	         Info,
-	         Warn,
-	         Error,
-	         Fatal
-	 };
+  /*********************
+    ** Logging
+    **********************/
+  enum LogLevel {
+    Debug,
+    Info,
+    Warn,
+    Error,
+    Fatal
+  };
 
-	QStringListModel* loggingModel() { return &logging_model; }
-	void log( const LogLevel &level, const std::string &msg);
+  QStringListModel* loggingModel() { return &logging_model; }
+  void log( const LogLevel &level, const std::string &msg);
 
   void statesCallback(const open_manipulator_msgs::OpenManipulatorState::ConstPtr &msg);
   void jointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg);
@@ -110,8 +110,8 @@ Q_SIGNALS:
   void rosShutdown();
 
 private:
-	int init_argc;
-	char** init_argv;
+  int init_argc;
+  char** init_argv;
   QStringListModel logging_model;
 
   ros::Publisher  open_manipulator_option_pub_;
