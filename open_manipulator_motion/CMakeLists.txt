@@ -42,7 +42,7 @@ generate_messages(
 ################################################################################
 catkin_package(
   INCLUDE_DIRS include  
-  CATKIN_DEPENDS roscpp std_msgs sensor_msgs open_manipulator_msgs robotis_manipulator open_manipulator_libs message_runtime
+  CATKIN_DEPENDS roscpp std_msgs sensor_msgs open_manipulator_msgs robotis_manipulator open_manipulator_6dof_libs message_runtime
   
 )
 
