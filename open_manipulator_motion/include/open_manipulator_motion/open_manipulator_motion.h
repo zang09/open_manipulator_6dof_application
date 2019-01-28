@@ -41,6 +41,9 @@ public:
   void motionStatesCallback(const std_msgs::Bool::ConstPtr &msg);
   bool setJointSpacePathToKinematicsPose(std::vector<double> kinematics_pose, double path_time);
 
+public:
+  bool motion_flag = false;
+
 };
 }
 

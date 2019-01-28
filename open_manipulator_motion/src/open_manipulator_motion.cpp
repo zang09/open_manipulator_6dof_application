@@ -52,23 +52,27 @@ void OM_MOTION::initClient()
 
 void OM_MOTION::motionStatesCallback(const std_msgs::Bool::ConstPtr &msg)
 {
-  std::cout << "Data: " << (int)msg->data << std::endl;
+  motion_flag = msg->data;
 
-  std::vector<double> kinematics_pose;
-
-  kinematics_pose.push_back(0.0);
-  kinematics_pose.push_back(0.0);
-  kinematics_pose.push_back(0.467);
-  kinematics_pose.push_back(1.0);
-  kinematics_pose.push_back(0.0);
-  kinematics_pose.push_back(0.0);
-  kinematics_pose.push_back(0.0);
-
-  if(!setJointSpacePathToKinematicsPose(kinematics_pose, 2.0))
+  if(motion_flag)
   {
-    cout << "Fail Service!" << endl;
-    return;
+    std::vector<double> kinematics_pose;
+
+    kinematics_pose.push_back(0.0);
+    kinematics_pose.push_back(0.0);
+    kinematics_pose.push_back(0.467);
+    kinematics_pose.push_back(1.0);
+    kinematics_pose.push_back(0.0);
+    kinematics_pose.push_back(0.0);
+    kinematics_pose.push_back(0.0);
+
+    if(!setJointSpacePathToKinematicsPose(kinematics_pose, 2.0))
+    {
+      cout << "Fail Service!" << endl;
+      return;
+    }
   }
+  motion_flag = 0;
 }
 
 bool OM_MOTION::setJointSpacePathToKinematicsPose(std::vector<double> kinematics_pose, double path_time)
