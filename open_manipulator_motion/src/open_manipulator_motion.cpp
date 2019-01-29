@@ -43,6 +43,7 @@ void OM_MOTION::initPublisher()
 void OM_MOTION::initSubscriber()
 {
   open_manipulator_gui_button_sub_ = node_handle_.subscribe("/open_manipulator_6dof/button_clicked", 10, &OM_MOTION::motionStatesCallback, this);
+  open_manipulator_ar_marker_sub_ = node_handle_.subscribe("/visualization_marker", 10, &OM_MOTION::markerPosCallback, this);
 }
 
 void OM_MOTION::initClient()
@@ -53,26 +54,31 @@ void OM_MOTION::initClient()
 void OM_MOTION::motionStatesCallback(const std_msgs::Bool::ConstPtr &msg)
 {
   motion_flag = msg->data;
+}
+
+void OM_MOTION::markerPosCallback(const visualization_msgs::Marker::ConstPtr &msg)
+{
+  std::vector<double> kinematics_pose;
 
   if(motion_flag)
   {
-    std::vector<double> kinematics_pose;
-
-    kinematics_pose.push_back(0.0);
-    kinematics_pose.push_back(0.0);
-    kinematics_pose.push_back(0.467);
-    kinematics_pose.push_back(1.0);
-    kinematics_pose.push_back(0.0);
-    kinematics_pose.push_back(0.0);
-    kinematics_pose.push_back(0.0);
+    kinematics_pose.push_back(msg->pose.position.x);
+    kinematics_pose.push_back(msg->pose.position.y);
+    kinematics_pose.push_back(msg->pose.position.z);
+    kinematics_pose.push_back(msg->pose.orientation.w);
+    kinematics_pose.push_back(msg->pose.orientation.x);
+    kinematics_pose.push_back(msg->pose.orientation.y);
+    kinematics_pose.push_back(msg->pose.orientation.z);
 
     if(!setJointSpacePathToKinematicsPose(kinematics_pose, 2.0))
     {
       cout << "Fail Service!" << endl;
       return;
     }
+
+    motion_flag = 0;
   }
-  motion_flag = 0;
+
 }
 
 bool OM_MOTION::setJointSpacePathToKinematicsPose(std::vector<double> kinematics_pose, double path_time)

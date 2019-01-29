@@ -6,6 +6,7 @@
 #include <eigen3/Eigen/Eigen>
 #include <sensor_msgs/JointState.h>
 
+#include "visualization_msgs/Marker.h"
 #include "open_manipulator_msgs/OpenManipulatorState.h"
 #include "open_manipulator_msgs/SetJointPosition.h"
 #include "open_manipulator_msgs/SetKinematicsPose.h"
@@ -27,6 +28,7 @@ private:
   // ROS Message
   ros::Publisher open_manipulator_motion_state_pub_;
   ros::Subscriber open_manipulator_gui_button_sub_;
+  ros::Subscriber open_manipulator_ar_marker_sub_;
 
   // ROS Service
   ros::ServiceClient goal_joint_space_path_to_kinematics_pose_client_;
@@ -39,6 +41,7 @@ public:
   void initSubscriber();
   void initClient();
   void motionStatesCallback(const std_msgs::Bool::ConstPtr &msg);
+  void markerPosCallback(const visualization_msgs::Marker::ConstPtr &msg);
   bool setJointSpacePathToKinematicsPose(std::vector<double> kinematics_pose, double path_time);
 
 public:
