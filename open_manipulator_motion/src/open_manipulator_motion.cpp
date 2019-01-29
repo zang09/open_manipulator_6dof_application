@@ -42,8 +42,9 @@ void OM_MOTION::initPublisher()
 
 void OM_MOTION::initSubscriber()
 {
-  open_manipulator_gui_button_sub_ = node_handle_.subscribe("/open_manipulator_6dof/button_clicked", 10, &OM_MOTION::motionStatesCallback, this);
-  open_manipulator_ar_marker_sub_ = node_handle_.subscribe("/visualization_marker", 10, &OM_MOTION::markerPosCallback, this);
+  open_manipulator_kinematics_pose_sub_ = node_handle_.subscribe("kinematics_pose", 10, &OM_MOTION::kinematicsPoseCallback, this);
+  open_manipulator_gui_button_sub_ = node_handle_.subscribe("button_clicked", 10, &OM_MOTION::motionStatesCallback, this);
+  open_manipulator_ar_marker_sub_ = node_handle_.subscribe("/ar_pose_marker", 10, &OM_MOTION::markerPosCallback, this);
 }
 
 void OM_MOTION::initClient()
@@ -51,30 +52,56 @@ void OM_MOTION::initClient()
   goal_joint_space_path_to_kinematics_pose_client_ = node_handle_.serviceClient<open_manipulator_msgs::SetKinematicsPose>("goal_joint_space_path_to_kinematics_pose");
 }
 
+void OM_MOTION::kinematicsPoseCallback(const open_manipulator_msgs::KinematicsPose::ConstPtr &msg)
+{
+  kinematics_pose_.pose = msg->pose;
+}
+
 void OM_MOTION::motionStatesCallback(const std_msgs::Bool::ConstPtr &msg)
 {
   motion_flag = msg->data;
 }
 
-void OM_MOTION::markerPosCallback(const visualization_msgs::Marker::ConstPtr &msg)
+void OM_MOTION::markerPosCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr &msg)
 {
+  std::vector<double> temp_position;
   std::vector<double> kinematics_pose;
 
-  if(motion_flag)
+  if(!(msg->markers.empty()))
   {
-    kinematics_pose.push_back(msg->pose.position.x);
-    kinematics_pose.push_back(msg->pose.position.y);
-    kinematics_pose.push_back(msg->pose.position.z);
-    kinematics_pose.push_back(msg->pose.orientation.w);
-    kinematics_pose.push_back(msg->pose.orientation.x);
-    kinematics_pose.push_back(msg->pose.orientation.y);
-    kinematics_pose.push_back(msg->pose.orientation.z);
+    msg->markers.
+    temp_position.push_back(msg->markers.at(0).pose.pose.position.x);
+    temp_position.push_back(msg->markers.at(0).pose.pose.position.y);
+    temp_position.push_back(msg->markers.at(0).pose.pose.position.z);
 
-    if(!setJointSpacePathToKinematicsPose(kinematics_pose, 2.0))
+    cout << "X: " << temp_position.at(0) << endl;
+    cout << "Y: " << temp_position.at(1) << endl;
+    cout << "Z: " << temp_position.at(2) << endl << endl;
+
+    if(motion_flag)
     {
-      cout << "Fail Service!" << endl;
-      return;
+      kinematics_pose.push_back(temp_position.at(0));
+      kinematics_pose.push_back(temp_position.at(1));
+      kinematics_pose.push_back(temp_position.at(2));
+
+      //    kinematics_pose.push_back(msg->pose.orientation.w);
+      //    kinematics_pose.push_back(msg->pose.orientation.x);
+      //    kinematics_pose.push_back(msg->pose.orientation.y);
+      //    kinematics_pose.push_back(msg->pose.orientation.z);
+
+      if(!setJointSpacePathToKinematicsPose(kinematics_pose, 2.0))
+      {
+        cout << "Fail Service!" << endl;
+        return;
+      }
+
+      //motion_flag = 0;
     }
+  }
+  else
+  {
+    if(motion_flag)
+      ROS_INFO("No markers!");
 
     motion_flag = 0;
   }
@@ -91,10 +118,10 @@ bool OM_MOTION::setJointSpacePathToKinematicsPose(std::vector<double> kinematics
   srv.request.kinematics_pose.pose.position.y = kinematics_pose.at(1);
   srv.request.kinematics_pose.pose.position.z = kinematics_pose.at(2);
 
-  srv.request.kinematics_pose.pose.orientation.w = kinematics_pose.at(3); //kinematics_pose_.pose.orientation.w;
-  srv.request.kinematics_pose.pose.orientation.x = kinematics_pose.at(4); //kinematics_pose_.pose.orientation.x;
-  srv.request.kinematics_pose.pose.orientation.y = kinematics_pose.at(5); //kinematics_pose_.pose.orientation.y;
-  srv.request.kinematics_pose.pose.orientation.z = kinematics_pose.at(6); //kinematics_pose_.pose.orientation.z;
+  srv.request.kinematics_pose.pose.orientation.w = kinematics_pose_.pose.orientation.w; //kinematics_pose.at(3);
+  srv.request.kinematics_pose.pose.orientation.x = kinematics_pose_.pose.orientation.x; //kinematics_pose.at(4);
+  srv.request.kinematics_pose.pose.orientation.y = kinematics_pose_.pose.orientation.y; //kinematics_pose.at(5);
+  srv.request.kinematics_pose.pose.orientation.z = kinematics_pose_.pose.orientation.z; //kinematics_pose.at(6);
 
   srv.request.path_time = path_time;
 
