@@ -320,7 +320,7 @@ void MainWindow::on_btn_send_kinematic_pose_clicked(void)
 {
   std::vector<double> kinematics_pose;
   Eigen::Quaterniond temp_orientation;
-  temp_orientation = RM_MATH::convertRPYToQuaternion(ui.doubleSpinBox_roll->value(), ui.doubleSpinBox_pitch->value(), ui.doubleSpinBox_yaw->value());
+  temp_orientation = robotis_manipulator_math::convertRPY2Quaternion(ui.doubleSpinBox_roll->value(), ui.doubleSpinBox_pitch->value(), ui.doubleSpinBox_yaw->value());
 
   double path_time = ui.doubleSpinBox_time_cs->value();
   kinematics_pose.push_back(ui.doubleSpinBox_x->value());
@@ -483,7 +483,7 @@ void MainWindow::on_btn_control_init_pos_clicked(void)
 void MainWindow::on_btn_control_p_pitch_clicked(void)
 {
   std::vector<double> goal_pose;    goal_pose.resize(7, 0.0);
-  Eigen::Quaterniond temp_orientation = RM_MATH::convertRPYToQuaternion(0.0,DELTA_ORI,0.0);
+  Eigen::Quaterniond temp_orientation = robotis_manipulator_math::convertRPY2Quaternion(0.0,DELTA_ORI,0.0);
   goal_pose.at(3) = temp_orientation.w();
   goal_pose.at(4) = temp_orientation.x();
   goal_pose.at(5) = temp_orientation.y();
@@ -494,7 +494,7 @@ void MainWindow::on_btn_control_p_pitch_clicked(void)
 void MainWindow::on_btn_control_m_pitch_clicked(void)
 {
   std::vector<double> goal_pose;    goal_pose.resize(7, 0.0);
-  Eigen::Quaterniond temp_orientation = RM_MATH::convertRPYToQuaternion(0.0,-DELTA_ORI,0.0);
+  Eigen::Quaterniond temp_orientation = robotis_manipulator_math::convertRPY2Quaternion(0.0,-DELTA_ORI,0.0);
   goal_pose.at(3) = temp_orientation.w();
   goal_pose.at(4) = temp_orientation.x();
   goal_pose.at(5) = temp_orientation.y();
@@ -505,7 +505,7 @@ void MainWindow::on_btn_control_m_pitch_clicked(void)
 void MainWindow::on_btn_control_p_roll_clicked(void)
 {
   std::vector<double> goal_pose;    goal_pose.resize(7, 0.0);
-  Eigen::Quaterniond temp_orientation = RM_MATH::convertRPYToQuaternion(DELTA_ORI,0.0,0.0);
+  Eigen::Quaterniond temp_orientation = robotis_manipulator_math::convertRPY2Quaternion(DELTA_ORI,0.0,0.0);
   goal_pose.at(3) = temp_orientation.w();
   goal_pose.at(4) = temp_orientation.x();
   goal_pose.at(5) = temp_orientation.y();
@@ -516,7 +516,7 @@ void MainWindow::on_btn_control_p_roll_clicked(void)
 void MainWindow::on_btn_control_m_roll_clicked(void)
 {
   std::vector<double> goal_pose;    goal_pose.resize(7, 0.0);
-  Eigen::Quaterniond temp_orientation = RM_MATH::convertRPYToQuaternion(-DELTA_ORI,0.0,0.0);
+  Eigen::Quaterniond temp_orientation = robotis_manipulator_math::convertRPY2Quaternion(-DELTA_ORI,0.0,0.0);
   goal_pose.at(3) = temp_orientation.w();
   goal_pose.at(4) = temp_orientation.x();
   goal_pose.at(5) = temp_orientation.y();
@@ -527,7 +527,7 @@ void MainWindow::on_btn_control_m_roll_clicked(void)
 void MainWindow::on_btn_control_p_yaw_clicked(void)
 {
   std::vector<double> goal_pose;    goal_pose.resize(7, 0.0);
-  Eigen::Quaterniond temp_orientation = RM_MATH::convertRPYToQuaternion(0.0,0.0,-0.03);
+  Eigen::Quaterniond temp_orientation = robotis_manipulator_math::convertRPY2Quaternion(0.0,0.0,-0.03);
   goal_pose.at(3) = temp_orientation.w();
   goal_pose.at(4) = temp_orientation.x();
   goal_pose.at(5) = temp_orientation.y();
@@ -538,7 +538,7 @@ void MainWindow::on_btn_control_p_yaw_clicked(void)
 void MainWindow::on_btn_control_m_yaw_clicked(void)
 {
   std::vector<double> goal_pose;    goal_pose.resize(7, 0.0);
-  Eigen::Quaterniond temp_orientation = RM_MATH::convertRPYToQuaternion(0.0,0.0,0.03);
+  Eigen::Quaterniond temp_orientation = robotis_manipulator_math::convertRPY2Quaternion(0.0,0.0,0.03);
   goal_pose.at(3) = temp_orientation.w();
   goal_pose.at(4) = temp_orientation.x();
   goal_pose.at(5) = temp_orientation.y();
@@ -549,7 +549,7 @@ void MainWindow::on_btn_control_m_yaw_clicked(void)
 void MainWindow::on_btn_control_init_ori_clicked(void)
 {
   std::vector<double> orientation_pose;
-  Eigen::Quaterniond temp_orientation = RM_MATH::convertRPYToQuaternion(-0.695,1.55,-0.7);
+  Eigen::Quaterniond temp_orientation = robotis_manipulator_math::convertRPY2Quaternion(-0.695,1.55,-0.7);
   orientation_pose.push_back(temp_orientation.w());
   orientation_pose.push_back(temp_orientation.x());
   orientation_pose.push_back(temp_orientation.y());

@@ -160,7 +160,7 @@ Eigen::Quaterniond QNode::getPresentKinematicsOri()
 }
 Eigen::Vector3d QNode::getPresentKinematicsOriRPY()
 {
-  present_kinematics_orientation_rpy_ = RM_MATH::convertQuaternionToRPYVector(present_kinematics_orientation_);
+  present_kinematics_orientation_rpy_ = robotis_manipulator_math::convertQuaternion2RPYVector(present_kinematics_orientation_);
 
   return present_kinematics_orientation_rpy_;
 }

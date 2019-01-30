@@ -55,7 +55,7 @@ void OM_MOTION::initClient()
 void OM_MOTION::kinematicsPoseCallback(const open_manipulator_msgs::KinematicsPose::ConstPtr &msg)
 {
   Eigen::Quaterniond temp_orientation(msg->pose.orientation.w, msg->pose.orientation.x, msg->pose.orientation.y, msg->pose.orientation.z);
-  kinematics_orientation_rpy_ = RM_MATH::convertQuaternionToRPYVector(temp_orientation);
+  kinematics_orientation_rpy_ = robotis_manipulator_math::convertQuaternion2RPYVector(temp_orientation);
 
   kinematics_pose_.pose = msg->pose;
 }
@@ -79,8 +79,8 @@ void OM_MOTION::markerPosCallback(const ar_track_alvar_msgs::AlvarMarkers::Const
     object_position.push_back(msg->markers.at(0).pose.pose.position.z);
 
     Eigen::Quaterniond temp_orientation(msg->markers.at(0).pose.pose.orientation.w, msg->markers.at(0).pose.pose.orientation.x, msg->markers.at(0).pose.pose.orientation.y, msg->markers.at(0).pose.pose.orientation.z);
-    rotation_orientation = RM_MATH::Matrix3(0,-1,0, -1,0,0, 0,0,1)*RM_MATH::convertQuaternionToRPYVector(temp_orientation);
-    object_orientation = RM_MATH::convertRPYToQuaternion(rotation_orientation.coeffRef(0,0), rotation_orientation.coeffRef(1,0), rotation_orientation.coeffRef(2,0));
+    rotation_orientation = robotis_manipulator_math::matrix3(0,-1,0, -1,0,0, 0,0,1)*robotis_manipulator_math::convertQuaternion2RPYVector(temp_orientation);
+    object_orientation = robotis_manipulator_math::convertRPY2Quaternion(rotation_orientation.coeffRef(0,0), rotation_orientation.coeffRef(1,0), rotation_orientation.coeffRef(2,0));
 
     cout << "R: " << rotation_orientation.coeffRef(0,0) << endl;
     cout << "P: " << rotation_orientation.coeffRef(1,0) << endl;
