@@ -67,56 +67,79 @@ void OM_MOTION::motionStatesCallback(const std_msgs::Bool::ConstPtr &msg)
 
 void OM_MOTION::markerPosCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr &msg)
 {
+  Eigen::Vector3d origin_orientation;
   Eigen::Vector3d rotation_orientation;
-  Eigen::Quaterniond object_orientation;
+  Eigen::Matrix3d rotation_matrix;
   std::vector<double> object_position;
   std::vector<double> kinematics_pose;
 
+  rotation_matrix = robotis_manipulator_math::matrix3(-1,0,0, 0,1,0, 0,0,1);
+
   if(!(msg->markers.empty()))
   {
-    object_position.push_back(msg->markers.at(0).pose.pose.position.x);
-    object_position.push_back(msg->markers.at(0).pose.pose.position.y);
-    object_position.push_back(msg->markers.at(0).pose.pose.position.z);
-
     Eigen::Quaterniond temp_orientation(msg->markers.at(0).pose.pose.orientation.w, msg->markers.at(0).pose.pose.orientation.x, msg->markers.at(0).pose.pose.orientation.y, msg->markers.at(0).pose.pose.orientation.z);
-    rotation_orientation = robotis_manipulator_math::matrix3(0,-1,0, -1,0,0, 0,0,1)*robotis_manipulator_math::convertQuaternion2RPYVector(temp_orientation);
-    object_orientation = robotis_manipulator_math::convertRPY2Quaternion(rotation_orientation.coeffRef(0,0), rotation_orientation.coeffRef(1,0), rotation_orientation.coeffRef(2,0));
 
-    cout << "R: " << rotation_orientation.coeffRef(0,0) << endl;
-    cout << "P: " << rotation_orientation.coeffRef(1,0) << endl;
-    cout << "Y: " << rotation_orientation.coeffRef(2,0) << endl << endl;
+    rotation_orientation = rotation_matrix * robotis_manipulator_math::convertQuaternion2RPYVector(temp_orientation);
+    origin_orientation = robotis_manipulator_math::convertQuaternion2RPYVector(temp_orientation);
 
-    cout << "r: " << kinematics_orientation_rpy_.coeffRef(0,0) << endl;
-    cout << "p: " << kinematics_orientation_rpy_.coeffRef(1,0) << endl;
-    cout << "y: " << kinematics_orientation_rpy_.coeffRef(2,0) << endl << endl;
+    cout << "r_r: " << kinematics_orientation_rpy_.coeff(0,0) << endl;
+    cout << "p_r: " << kinematics_orientation_rpy_.coeff(1,0) << endl;
+    cout << "y_r: " << kinematics_orientation_rpy_.coeff(2,0) << endl << endl;
+
+    cout << "r_m: " << rotation_orientation.coeff(0,0) << endl;
+    cout << "p_m: " << rotation_orientation.coeff(1,0) << endl;
+    cout << "y_m: " << rotation_orientation.coeff(2,0) << endl << endl;
 
 
-    if(motion_flag)
-    {
-      kinematics_pose.push_back(object_position.at(0));
-      kinematics_pose.push_back(object_position.at(1));
-      kinematics_pose.push_back(object_position.at(2));
-      kinematics_pose.push_back(object_orientation.w());
-      kinematics_pose.push_back(object_orientation.x());
-      kinematics_pose.push_back(object_orientation.y());
-      kinematics_pose.push_back(object_orientation.z());
 
-      if(!setJointSpacePathToKinematicsPose(kinematics_pose, 2.0))
-      {
-        cout << "Fail Service!" << endl;
-        return;
-      }
-
-      motion_flag = 0;
-    }
+    //quaternionToEulerN();
   }
-  else
-  {
-    if(motion_flag)
-      ROS_INFO("No markers!");
 
-    motion_flag = 0;
-  }
+//  if(!(msg->markers.empty()))
+//  {
+//    object_position.push_back(msg->markers.at(0).pose.pose.position.x);
+//    object_position.push_back(msg->markers.at(0).pose.pose.position.y);
+//    object_position.push_back(msg->markers.at(0).pose.pose.position.z);
+
+//    Eigen::Quaterniond temp_orientation(msg->markers.at(0).pose.pose.orientation.w, msg->markers.at(0).pose.pose.orientation.x, msg->markers.at(0).pose.pose.orientation.y, msg->markers.at(0).pose.pose.orientation.z);
+//    rotation_orientation = robotis_manipulator_math::matrix3(0,-1,0, -1,0,0, 0,0,1)*robotis_manipulator_math::convertQuaternion2RPYVector(temp_orientation);
+//    object_orientation = robotis_manipulator_math::convertRPY2Quaternion(rotation_orientation.coeffRef(0,0), rotation_orientation.coeffRef(1,0), rotation_orientation.coeffRef(2,0));
+
+//    cout << "R: " << rotation_orientation.coeffRef(0,0) << endl;
+//    cout << "P: " << rotation_orientation.coeffRef(1,0) << endl;
+//    cout << "Y: " << rotation_orientation.coeffRef(2,0) << endl << endl;
+
+//    cout << "r: " << kinematics_orientation_rpy_.coeffRef(0,0) << endl;
+//    cout << "p: " << kinematics_orientation_rpy_.coeffRef(1,0) << endl;
+//    cout << "y: " << kinematics_orientation_rpy_.coeffRef(2,0) << endl << endl;
+
+
+//    if(motion_flag)
+//    {
+//      kinematics_pose.push_back(object_position.at(0));
+//      kinematics_pose.push_back(object_position.at(1));
+//      kinematics_pose.push_back(object_position.at(2));
+//      kinematics_pose.push_back(object_orientation.w());
+//      kinematics_pose.push_back(object_orientation.x());
+//      kinematics_pose.push_back(object_orientation.y());
+//      kinematics_pose.push_back(object_orientation.z());
+
+//      if(!setJointSpacePathToKinematicsPose(kinematics_pose, 2.0))
+//      {
+//        cout << "Fail Service!" << endl;
+//        return;
+//      }
+
+//      motion_flag = 0;
+//    }
+//  }
+//  else
+//  {
+//    if(motion_flag)
+//      ROS_INFO("No markers!");
+
+//    motion_flag = 0;
+//  }
 
 }
 
@@ -144,6 +167,53 @@ bool OM_MOTION::setJointSpacePathToKinematicsPose(std::vector<double> kinematics
     return srv.response.is_planned;
   }
   return false;
+}
+
+void OM_MOTION::quaternionToEulerV(const Eigen::Quaterniond quaterniond)
+{
+  double x,y,z,w;
+
+  w = quaterniond.w();
+  x = quaterniond.x();
+  y = quaterniond.y();
+  z = quaterniond.z();
+
+  double sqx = x*x;
+  double sqy = y*y;
+  double sqz = z*z;
+  double sqw = w*w;
+
+  double eulerX = (double)(atan2(2.0*(y*z + x*w),(-sqx-sqy+sqz+sqw))*PI);
+  double eulerY = (double)(asin(-2.0*(x*z-y*w))*PI);
+  double eulerZ = (double)(atan2(2.0*(x*y+z*w),(sqx-sqy-sqz+sqw))*PI);
+
+  cout << "EULERX: " << eulerX << endl;
+  cout << "EULERY: " << eulerY << endl;
+  cout << "EULERZ: " << eulerZ << endl << endl;
+}
+
+
+void OM_MOTION::quaternionToEulerN()
+{
+  double x,y,z,w;
+
+  w = kinematics_pose_.pose.orientation.w;
+  x = kinematics_pose_.pose.orientation.x;
+  y = kinematics_pose_.pose.orientation.y;
+  z = kinematics_pose_.pose.orientation.z;
+
+  double sqx = x*x;
+  double sqy = y*y;
+  double sqz = z*z;
+  double sqw = w*w;
+
+  double eulerX = (double)(atan2(2.0*(y*z + x*w),(-sqx-sqy+sqz+sqw))*PI);
+  double eulerY = (double)(asin(-2.0*(x*z-y*w))*PI);
+  double eulerZ = (double)(atan2(2.0*(x*y+z*w),(sqx-sqy-sqz+sqw))*PI);
+
+  cout << "eulerx: " << eulerX << endl;
+  cout << "eulery: " << eulerY << endl;
+  cout << "eulerz: " << eulerZ << endl << endl;
 }
 
 int main(int argc, char **argv)

@@ -49,6 +49,9 @@ public:
   void markerPosCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr &msg);
   bool setJointSpacePathToKinematicsPose(std::vector<double> kinematics_pose, double path_time);
 
+  void quaternionToEulerV(const Eigen::Quaterniond quaterniond);
+  void quaternionToEulerN();
+
 public:
   bool motion_flag = false;
 
