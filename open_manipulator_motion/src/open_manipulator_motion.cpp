@@ -18,7 +18,7 @@
 using namespace open_manipulator_motion;
 using namespace std;
 
-OM_MOTION::OM_MOTION()
+OpenManipulatorMotion::OpenManipulatorMotion()
   :node_handle_("")
 {
   initPublisher();
@@ -26,7 +26,7 @@ OM_MOTION::OM_MOTION()
   initClient();
 }
 
-OM_MOTION::~OM_MOTION()
+OpenManipulatorMotion::~OpenManipulatorMotion()
 {
   if(ros::isStarted()) {
     ros::shutdown(); // explicitly needed since we use ros::start();
@@ -35,24 +35,24 @@ OM_MOTION::~OM_MOTION()
   wait();
 }
 
-void OM_MOTION::initPublisher()
+void OpenManipulatorMotion::initPublisher()
 {
   open_manipulator_motion_state_pub_ = node_handle_.advertise<open_manipulator_motion::MotionState>("motion_state", 10);
 }
 
-void OM_MOTION::initSubscriber()
+void OpenManipulatorMotion::initSubscriber()
 {
-  open_manipulator_kinematics_pose_sub_ = node_handle_.subscribe("kinematics_pose", 10, &OM_MOTION::kinematicsPoseCallback, this);
-  open_manipulator_gui_button_sub_ = node_handle_.subscribe("button_clicked", 10, &OM_MOTION::motionStatesCallback, this);
-  open_manipulator_ar_marker_sub_ = node_handle_.subscribe("/ar_pose_marker", 10, &OM_MOTION::markerPosCallback, this);
+  open_manipulator_kinematics_pose_sub_ = node_handle_.subscribe("kinematics_pose", 10, &OpenManipulatorMotion::kinematicsPoseCallback, this);
+  open_manipulator_gui_button_sub_ = node_handle_.subscribe("button_clicked", 10, &OpenManipulatorMotion::motionStatesCallback, this);
+  open_manipulator_ar_marker_sub_ = node_handle_.subscribe("/ar_pose_marker", 10, &OpenManipulatorMotion::markerPosCallback, this);
 }
 
-void OM_MOTION::initClient()
+void OpenManipulatorMotion::initClient()
 {
   goal_joint_space_path_to_kinematics_pose_client_ = node_handle_.serviceClient<open_manipulator_msgs::SetKinematicsPose>("goal_joint_space_path_to_kinematics_pose");
 }
 
-void OM_MOTION::kinematicsPoseCallback(const open_manipulator_msgs::KinematicsPose::ConstPtr &msg)
+void OpenManipulatorMotion::kinematicsPoseCallback(const open_manipulator_msgs::KinematicsPose::ConstPtr &msg)
 {
   Eigen::Quaterniond temp_orientation(msg->pose.orientation.w, msg->pose.orientation.x, msg->pose.orientation.y, msg->pose.orientation.z);
   kinematics_orientation_rpy_ = robotis_manipulator_math::convertQuaternion2RPYVector(temp_orientation);
@@ -60,12 +60,12 @@ void OM_MOTION::kinematicsPoseCallback(const open_manipulator_msgs::KinematicsPo
   kinematics_pose_.pose = msg->pose;
 }
 
-void OM_MOTION::motionStatesCallback(const std_msgs::Bool::ConstPtr &msg)
+void OpenManipulatorMotion::motionStatesCallback(const std_msgs::Bool::ConstPtr &msg)
 {
   motion_flag = msg->data;
 }
 
-void OM_MOTION::markerPosCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr &msg)
+void OpenManipulatorMotion::markerPosCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr &msg)
 {
   Eigen::Vector3d rotation_orientation;
   Eigen::Quaterniond object_orientation;
@@ -120,7 +120,7 @@ void OM_MOTION::markerPosCallback(const ar_track_alvar_msgs::AlvarMarkers::Const
 
 }
 
-bool OM_MOTION::setJointSpacePathToKinematicsPose(std::vector<double> kinematics_pose, double path_time)
+bool OpenManipulatorMotion::setJointSpacePathToKinematicsPose(std::vector<double> kinematics_pose, double path_time)
 {
   open_manipulator_msgs::SetKinematicsPose srv;
 
@@ -150,7 +150,7 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "open_manipulator_motion");
 
-  OM_MOTION om_motion;
+  OpenManipulatorMotion openmanipulatormotion;
 
   ROS_INFO("OpenManipulator Motion Node");
 

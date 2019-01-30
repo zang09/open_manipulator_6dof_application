@@ -19,7 +19,7 @@
 namespace open_manipulator_motion
 {
 
-class OM_MOTION
+class OpenManipulatorMotion
 {
 private:
   // ROS NodeHandle
@@ -38,8 +38,8 @@ private:
   Eigen::Vector3d kinematics_orientation_rpy_;
 
 public:
-  OM_MOTION();
-  ~OM_MOTION();
+  OpenManipulatorMotion();
+  ~OpenManipulatorMotion();
 
   void initPublisher();
   void initSubscriber();
