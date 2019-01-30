@@ -54,6 +54,9 @@ void OM_MOTION::initClient()
 
 void OM_MOTION::kinematicsPoseCallback(const open_manipulator_msgs::KinematicsPose::ConstPtr &msg)
 {
+  Eigen::Quaterniond temp_orientation(msg->pose.orientation.w, msg->pose.orientation.x, msg->pose.orientation.y, msg->pose.orientation.z);
+  kinematics_orientation_rpy_ = RM_MATH::convertQuaternionToRPYVector(temp_orientation);
+
   kinematics_pose_.pose = msg->pose;
 }
 
@@ -64,30 +67,39 @@ void OM_MOTION::motionStatesCallback(const std_msgs::Bool::ConstPtr &msg)
 
 void OM_MOTION::markerPosCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr &msg)
 {
-  std::vector<double> temp_position;
+  Eigen::Vector3d rotation_orientation;
+  Eigen::Quaterniond object_orientation;
+  std::vector<double> object_position;
   std::vector<double> kinematics_pose;
 
   if(!(msg->markers.empty()))
   {
-    msg->markers.
-    temp_position.push_back(msg->markers.at(0).pose.pose.position.x);
-    temp_position.push_back(msg->markers.at(0).pose.pose.position.y);
-    temp_position.push_back(msg->markers.at(0).pose.pose.position.z);
+    object_position.push_back(msg->markers.at(0).pose.pose.position.x);
+    object_position.push_back(msg->markers.at(0).pose.pose.position.y);
+    object_position.push_back(msg->markers.at(0).pose.pose.position.z);
 
-    cout << "X: " << temp_position.at(0) << endl;
-    cout << "Y: " << temp_position.at(1) << endl;
-    cout << "Z: " << temp_position.at(2) << endl << endl;
+    Eigen::Quaterniond temp_orientation(msg->markers.at(0).pose.pose.orientation.w, msg->markers.at(0).pose.pose.orientation.x, msg->markers.at(0).pose.pose.orientation.y, msg->markers.at(0).pose.pose.orientation.z);
+    rotation_orientation = RM_MATH::Matrix3(0,-1,0, -1,0,0, 0,0,1)*RM_MATH::convertQuaternionToRPYVector(temp_orientation);
+    object_orientation = RM_MATH::convertRPYToQuaternion(rotation_orientation.coeffRef(0,0), rotation_orientation.coeffRef(1,0), rotation_orientation.coeffRef(2,0));
+
+    cout << "R: " << rotation_orientation.coeffRef(0,0) << endl;
+    cout << "P: " << rotation_orientation.coeffRef(1,0) << endl;
+    cout << "Y: " << rotation_orientation.coeffRef(2,0) << endl << endl;
+
+    cout << "r: " << kinematics_orientation_rpy_.coeffRef(0,0) << endl;
+    cout << "p: " << kinematics_orientation_rpy_.coeffRef(1,0) << endl;
+    cout << "y: " << kinematics_orientation_rpy_.coeffRef(2,0) << endl << endl;
+
 
     if(motion_flag)
     {
-      kinematics_pose.push_back(temp_position.at(0));
-      kinematics_pose.push_back(temp_position.at(1));
-      kinematics_pose.push_back(temp_position.at(2));
-
-      //    kinematics_pose.push_back(msg->pose.orientation.w);
-      //    kinematics_pose.push_back(msg->pose.orientation.x);
-      //    kinematics_pose.push_back(msg->pose.orientation.y);
-      //    kinematics_pose.push_back(msg->pose.orientation.z);
+      kinematics_pose.push_back(object_position.at(0));
+      kinematics_pose.push_back(object_position.at(1));
+      kinematics_pose.push_back(object_position.at(2));
+      kinematics_pose.push_back(object_orientation.w());
+      kinematics_pose.push_back(object_orientation.x());
+      kinematics_pose.push_back(object_orientation.y());
+      kinematics_pose.push_back(object_orientation.z());
 
       if(!setJointSpacePathToKinematicsPose(kinematics_pose, 2.0))
       {
@@ -95,7 +107,7 @@ void OM_MOTION::markerPosCallback(const ar_track_alvar_msgs::AlvarMarkers::Const
         return;
       }
 
-      //motion_flag = 0;
+      motion_flag = 0;
     }
   }
   else
@@ -118,10 +130,10 @@ bool OM_MOTION::setJointSpacePathToKinematicsPose(std::vector<double> kinematics
   srv.request.kinematics_pose.pose.position.y = kinematics_pose.at(1);
   srv.request.kinematics_pose.pose.position.z = kinematics_pose.at(2);
 
-  srv.request.kinematics_pose.pose.orientation.w = kinematics_pose_.pose.orientation.w; //kinematics_pose.at(3);
-  srv.request.kinematics_pose.pose.orientation.x = kinematics_pose_.pose.orientation.x; //kinematics_pose.at(4);
-  srv.request.kinematics_pose.pose.orientation.y = kinematics_pose_.pose.orientation.y; //kinematics_pose.at(5);
-  srv.request.kinematics_pose.pose.orientation.z = kinematics_pose_.pose.orientation.z; //kinematics_pose.at(6);
+  srv.request.kinematics_pose.pose.orientation.w = kinematics_pose.at(3);
+  srv.request.kinematics_pose.pose.orientation.x = kinematics_pose.at(4);
+  srv.request.kinematics_pose.pose.orientation.y = kinematics_pose.at(5);
+  srv.request.kinematics_pose.pose.orientation.z = kinematics_pose.at(6);
 
   srv.request.path_time = path_time;
 

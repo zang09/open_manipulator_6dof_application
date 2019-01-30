@@ -35,6 +35,7 @@ private:
   ros::ServiceClient goal_joint_space_path_to_kinematics_pose_client_;
 
   open_manipulator_msgs::KinematicsPose kinematics_pose_;
+  Eigen::Vector3d kinematics_orientation_rpy_;
 
 public:
   OM_MOTION();
