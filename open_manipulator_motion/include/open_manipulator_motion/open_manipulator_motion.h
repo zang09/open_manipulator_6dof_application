@@ -35,7 +35,9 @@ private:
   ros::ServiceClient goal_joint_space_path_to_kinematics_pose_client_;
 
   open_manipulator_msgs::KinematicsPose kinematics_pose_;
+  Eigen::Quaterniond kinematics_orientation_;
   Eigen::Vector3d kinematics_orientation_rpy_;
+  Eigen::Matrix3d kinematics_orientation_matrix_;
 
 public:
   OpenManipulatorMotion();
@@ -48,9 +50,6 @@ public:
   void motionStatesCallback(const std_msgs::Bool::ConstPtr &msg);
   void markerPosCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr &msg);
   bool setJointSpacePathToKinematicsPose(std::vector<double> kinematics_pose, double path_time);
-
-  void quaternionToEulerV(const Eigen::Quaterniond quaterniond);
-  void quaternionToEulerN();
 
 public:
   bool motion_flag = false;
