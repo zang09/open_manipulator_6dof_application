@@ -142,6 +142,7 @@ void MainWindow::on_btn_timer_start_clicked(void)
     ui.btn_send_joint_angle->setEnabled(true);
     ui.btn_send_kinematic_pose->setEnabled(true);
     ui.btn_send_drawing_trajectory->setEnabled(true);
+    ui.btn_get_manipulator_setting->setEnabled(true);
     ui.btn_set_gripper->setEnabled(true);
     ui.btn_pick->setEnabled(true);
     ui.btn_multi->setEnabled(true);
@@ -164,6 +165,7 @@ void MainWindow::on_btn_timer_start_clicked(void)
     ui.btn_send_joint_angle->setEnabled(false);
     ui.btn_send_kinematic_pose->setEnabled(false);
     ui.btn_send_drawing_trajectory->setEnabled(false);
+    ui.btn_get_manipulator_setting->setEnabled(false);
     ui.btn_set_gripper->setEnabled(false);
     ui.btn_pick->setEnabled(false);
     ui.btn_multi->setEnabled(false);
