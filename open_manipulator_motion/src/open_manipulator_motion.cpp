@@ -73,7 +73,7 @@ void OpenManipulatorMotion::markerPosCallback(const ar_track_alvar_msgs::AlvarMa
   std::vector<double> object_position;
   std::vector<double> kinematics_pose;
 
-  rotation_matrix = robotis_manipulator_math::matrix3(-1,0,0, 0,1,0, 0,0,1);
+  rotation_matrix = robotis_manipulator_math::matrix3(1,0,0, 0,1,0, 0,0,-1);
 
   if(!(msg->markers.empty()))
   {
@@ -169,7 +169,7 @@ bool OpenManipulatorMotion::setJointSpacePathToKinematicsPose(std::vector<double
   return false;
 }
 
-void OM_MOTION::quaternionToEulerV(const Eigen::Quaterniond quaterniond)
+void OpenManipulatorMotion::quaternionToEulerV(const Eigen::Quaterniond quaterniond)
 {
   double x,y,z,w;
 
@@ -193,7 +193,7 @@ void OM_MOTION::quaternionToEulerV(const Eigen::Quaterniond quaterniond)
 }
 
 
-void OM_MOTION::quaternionToEulerN()
+void OpenManipulatorMotion::quaternionToEulerN()
 {
   double x,y,z,w;
 
