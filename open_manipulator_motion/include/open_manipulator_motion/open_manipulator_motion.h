@@ -16,6 +16,8 @@
 
 #include "open_manipulator_motion/MotionState.h"
 
+#define  Z_OFFSET  0.015
+
 namespace open_manipulator_motion
 {
 
@@ -50,6 +52,7 @@ public:
   void motionStatesCallback(const std_msgs::Bool::ConstPtr &msg);
   void markerPosCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr &msg);
   bool setJointSpacePathToKinematicsPose(std::vector<double> kinematics_pose, double path_time);
+  Eigen::Matrix3d orientationSolver(Eigen::Matrix3d desired_orientation1, Eigen::Matrix3d desired_orientation2, Eigen::Matrix3d present_orientation);
 
 public:
   bool motion_flag = false;

@@ -102,10 +102,10 @@ void MainWindow::motion_wait(unsigned int time)
 }
 void MainWindow::tabSelected()
 {
-  if(ui.tabWidget->currentIndex()==0)
-    on_btn_read_joint_angle_clicked();
-  if(ui.tabWidget->currentIndex()==1)
-    on_btn_read_kinematic_pose_clicked();
+//  if(ui.tabWidget->currentIndex()==0)
+//    on_btn_read_joint_angle_clicked();
+//  if(ui.tabWidget->currentIndex()==1)
+//    on_btn_read_kinematic_pose_clicked();
 //  if(ui.tabWidget->currentIndex()==2)
 //    on_btn_home_pose_clicked();
 }

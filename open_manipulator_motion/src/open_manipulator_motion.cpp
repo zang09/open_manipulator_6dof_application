@@ -52,40 +52,19 @@ void OpenManipulatorMotion::initClient()
   goal_joint_space_path_to_kinematics_pose_client_ = node_handle_.serviceClient<open_manipulator_msgs::SetKinematicsPose>("goal_joint_space_path_to_kinematics_pose");
 }
 
-void OpenManipulatorMotion::kinematicsPoseCallback(const open_manipulator_msgs::KinematicsPose::ConstPtr &msg)
-{
-  Eigen::Quaterniond temp_orientation(msg->pose.orientation.w, msg->pose.orientation.x, msg->pose.orientation.y, msg->pose.orientation.z);
-
-  kinematics_orientation_ = temp_orientation;
-  kinematics_orientation_rpy_ = robotis_manipulator_math::convertQuaternion2RPYVector(temp_orientation);
-  kinematics_orientation_matrix_ = robotis_manipulator_math::convertQuaternion2RotationMatrix(temp_orientation);
-
-  kinematics_pose_.pose = msg->pose;
-}
-
-void OpenManipulatorMotion::motionStatesCallback(const std_msgs::Bool::ConstPtr &msg)
-{
-  motion_flag = msg->data;
-}
-
 void OpenManipulatorMotion::markerPosCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr &msg)
 {
-  Eigen::Matrix3d end_effector_matrix;
-  Eigen::Matrix3d marker_matrix;
-  Eigen::Matrix3d rotation_matrix1;
-  Eigen::Matrix3d rotation_matrix2;
-
-  Eigen::Vector3d marker_rpy;
-  Eigen::Vector3d object_orientation_rpy1;
-  Eigen::Vector3d object_orientation_rpy2;
-
-  Eigen::Matrix3d object_orientation1;
-  Eigen::Matrix3d object_orientation2;
-
+  Eigen::Vector3d temp_orientation_rpy;
+  Eigen::Matrix3d forward_transform_axis_matrix;
+  Eigen::Matrix3d reverse_transform_axis_matrix;
+  Eigen::Matrix3d forward_transform_rpy_matrix;
+  Eigen::Matrix3d reverse_transform_rpy_matrix;
+  Eigen::Matrix3d forward_desired_orientation_matrix;
+  Eigen::Matrix3d reverse_desired_orientation_matrix;
+  Eigen::Matrix3d object_orientation_matrix;
+  Eigen::Quaterniond object_orientation;
   std::vector<double> object_position;
   std::vector<double> kinematics_pose;
-
-  //end_effector_matrix = robotis_manipulator_math::convertQuaternion2RotationMatrix(kinematics_orientation_);
 
   if(!(msg->markers.empty()))
   {
@@ -96,46 +75,32 @@ void OpenManipulatorMotion::markerPosCallback(const ar_track_alvar_msgs::AlvarMa
 
     //Get Orientation
     Eigen::Quaterniond temp_orientation(msg->markers.at(0).pose.pose.orientation.w, msg->markers.at(0).pose.pose.orientation.x, msg->markers.at(0).pose.pose.orientation.y, msg->markers.at(0).pose.pose.orientation.z);
-    marker_matrix = robotis_manipulator_math::convertQuaternion2RotationMatrix(temp_orientation);
-    marker_rpy = robotis_manipulator_math::convertRotationMatrix2RPYVector(marker_matrix);
-    rotation_matrix1 = robotis_manipulator_math::convertPitchAngle2RotationMatrix(-PI);
-    rotation_matrix2 = robotis_manipulator_math::convertYawAngle2RotationMatrix(-PI)*rotation_matrix1;
+    temp_orientation_rpy = robotis_manipulator_math::convertQuaternion2RPYVector(temp_orientation);
 
-    //Solve two method
-    object_orientation_rpy1 = robotis_manipulator_math::convertRotationMatrix2RPYVector(rotation_matrix1*marker_matrix);
-    object_orientation_rpy2 = robotis_manipulator_math::convertRotationMatrix2RPYVector(rotation_matrix2*marker_matrix);
+    //Calculate
+    forward_transform_axis_matrix = robotis_manipulator_math::convertRPY2RotationMatrix(-temp_orientation_rpy.coeff(0,0), temp_orientation_rpy.coeff(1,0), -temp_orientation_rpy.coeff(2,0));
+    forward_transform_rpy_matrix = robotis_manipulator_math::convertPitchAngle2RotationMatrix(PI);
+    forward_desired_orientation_matrix = forward_transform_axis_matrix*forward_transform_rpy_matrix;
 
-    object_orientation1 = robotis_manipulator_math::convertRPY2RotationMatrix(object_orientation_rpy1.coeff(0,0), object_orientation_rpy1.coeff(1,0), -object_orientation_rpy1.coeff(2,0));
-    object_orientation2 = robotis_manipulator_math::convertRPY2RotationMatrix(object_orientation_rpy2.coeff(0,0), object_orientation_rpy2.coeff(1,0), -object_orientation_rpy2.coeff(2,0));
+    reverse_transform_axis_matrix = robotis_manipulator_math::convertRPY2RotationMatrix(temp_orientation_rpy.coeff(0,0), -temp_orientation_rpy.coeff(1,0), -temp_orientation_rpy.coeff(2,0));
+    reverse_transform_rpy_matrix = robotis_manipulator_math::convertRollAngle2RotationMatrix(PI);
+    reverse_desired_orientation_matrix = reverse_transform_axis_matrix*reverse_transform_rpy_matrix;
 
-    Eigen::Vector3d solution1 = robotis_manipulator_math::orientationDifference(object_orientation1, kinematics_orientation_matrix_);
-    Eigen::Vector3d solution2 = robotis_manipulator_math::orientationDifference(object_orientation2, kinematics_orientation_matrix_);
-
-    double solve1 = solution1.transpose() * solution1;
-    double solve2 = solution2.transpose() * solution2;
-
-    cout << "solve1: " << solve1 << endl;
-    cout << "solve2: " << solve2 << endl;
-
-//    cout << "r_r: " << kinematics_orientation_rpy_.coeff(0,0) << endl;
-//    cout << "p_r: " << kinematics_orientation_rpy_.coeff(1,0) << endl;
-//    cout << "y_r: " << kinematics_orientation_rpy_.coeff(2,0) << endl << endl;
-
-//    cout << "r_m: " << object_orientation_rpy.coeff(0,0) << endl;
-//    cout << "p_m: " << object_orientation_rpy.coeff(1,0) << endl;
-//    cout << "y_m: " << -object_orientation_rpy.coeff(2,0) << endl << endl;
+    object_orientation_matrix = orientationSolver(forward_desired_orientation_matrix, reverse_desired_orientation_matrix, kinematics_orientation_matrix_);
+    object_orientation = robotis_manipulator_math::convertRotationMatrix2Quaternion(object_orientation_matrix);
 
     if(motion_flag)
     {
+      double path_time = 2.5;
       kinematics_pose.push_back(object_position.at(0));
       kinematics_pose.push_back(object_position.at(1));
-      kinematics_pose.push_back(object_position.at(2)+(0.05));
-//      kinematics_pose.push_back(object_orientation1.w());
-//      kinematics_pose.push_back(object_orientation1.x());
-//      kinematics_pose.push_back(object_orientation1.y());
-//      kinematics_pose.push_back(object_orientation1.z());
+      kinematics_pose.push_back(object_position.at(2)+Z_OFFSET);
+      kinematics_pose.push_back(object_orientation.w());
+      kinematics_pose.push_back(object_orientation.x());
+      kinematics_pose.push_back(object_orientation.y());
+      kinematics_pose.push_back(object_orientation.z());
 
-      if(!setJointSpacePathToKinematicsPose(kinematics_pose, 2.5))
+      if(!setJointSpacePathToKinematicsPose(kinematics_pose, path_time))
       {
         cout << "Fail Service!" << endl;
         return;
@@ -150,6 +115,22 @@ void OpenManipulatorMotion::markerPosCallback(const ar_track_alvar_msgs::AlvarMa
 
     motion_flag = 0;
   }
+}
+
+void OpenManipulatorMotion::kinematicsPoseCallback(const open_manipulator_msgs::KinematicsPose::ConstPtr &msg)
+{
+  Eigen::Quaterniond temp_orientation(msg->pose.orientation.w, msg->pose.orientation.x, msg->pose.orientation.y, msg->pose.orientation.z);
+
+  kinematics_orientation_ = temp_orientation;
+  kinematics_orientation_rpy_ = robotis_manipulator_math::convertQuaternion2RPYVector(temp_orientation);
+  kinematics_orientation_matrix_ = robotis_manipulator_math::convertQuaternion2RotationMatrix(temp_orientation);
+
+  kinematics_pose_.pose = msg->pose;
+}
+
+void OpenManipulatorMotion::motionStatesCallback(const std_msgs::Bool::ConstPtr &msg)
+{
+  motion_flag = msg->data;
 }
 
 bool OpenManipulatorMotion::setJointSpacePathToKinematicsPose(std::vector<double> kinematics_pose, double path_time)
@@ -169,13 +150,30 @@ bool OpenManipulatorMotion::setJointSpacePathToKinematicsPose(std::vector<double
 
   srv.request.path_time = path_time;
 
-  cout << "call" << endl;
-
   if(goal_joint_space_path_to_kinematics_pose_client_.call(srv))
   {
     return srv.response.is_planned;
   }
   return false;
+}
+
+Eigen::Matrix3d OpenManipulatorMotion::orientationSolver(Eigen::Matrix3d desired_orientation1, Eigen::Matrix3d desired_orientation2, Eigen::Matrix3d present_orientation)
+{
+  Eigen::Vector3d solution1;
+  Eigen::Vector3d solution2;
+  double solution1_value;
+  double solution2_value;
+
+  solution1 = robotis_manipulator_math::orientationDifference(desired_orientation1, present_orientation);
+  solution2 = robotis_manipulator_math::orientationDifference(desired_orientation2, present_orientation);
+
+  solution1_value = solution1.transpose() * solution1;
+  solution2_value = solution2.transpose() * solution2;
+
+  if(solution1_value < solution2_value)
+    return desired_orientation1;
+  else
+    return desired_orientation2;
 }
 
 int main(int argc, char **argv)
