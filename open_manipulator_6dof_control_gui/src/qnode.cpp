@@ -36,6 +36,7 @@
 /*****************************************************************************
 ** Namespaces
 *****************************************************************************/
+using namespace robotis_manipulator;
 
 namespace open_manipulator_control_gui {
 
@@ -160,7 +161,7 @@ Eigen::Quaterniond QNode::getPresentKinematicsOri()
 }
 Eigen::Vector3d QNode::getPresentKinematicsOriRPY()
 {
-  present_kinematics_orientation_rpy_ = robotis_manipulator_math::convertQuaternion2RPYVector(present_kinematics_orientation_);
+  present_kinematics_orientation_rpy_ = math::convertQuaternionToRPYVector(present_kinematics_orientation_);
 
   return present_kinematics_orientation_rpy_;
 }
