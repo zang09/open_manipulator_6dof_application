@@ -71,12 +71,11 @@ bool QNode::init() {
   open_manipulator_option_pub_ = n.advertise<std_msgs::String>("option", 10);
   open_manipulator_gui_button_pub_ = n.advertise<std_msgs::Bool>("button_clicked", 10);
   // msg subscriber
-  open_manipulator_states_sub_          = n.subscribe("states", 10, &QNode::statesCallback, this);
+  open_manipulator_states_sub_          = n.subscribe("states", 10, &QNode::manipulatorStatesCallback, this);
   open_manipulator_joint_states_sub_    = n.subscribe("joint_states", 10, &QNode::jointStatesCallback, this);
   open_manipulator_kinematics_pose_sub_ = n.subscribe("kinematics_pose", 10, &QNode::kinematicsPoseCallback, this);
   // service client
   goal_joint_space_path_client_ = n.serviceClient<open_manipulator_msgs::SetJointPosition>("goal_joint_space_path");
-
   goal_joint_space_path_to_kinematics_pose_client_ = n.serviceClient<open_manipulator_msgs::SetKinematicsPose>("goal_joint_space_path_to_kinematics_pose");
 
   //goal_task_space_path_client_               = n.serviceClient<open_manipulator_msgs::SetKinematicsPose>("goal_task_space_path");
@@ -102,7 +101,7 @@ void QNode::run() {
   Q_EMIT rosShutdown();
 }
 
-void QNode::statesCallback(const open_manipulator_msgs::OpenManipulatorState::ConstPtr &msg)
+void QNode::manipulatorStatesCallback(const open_manipulator_msgs::OpenManipulatorState::ConstPtr &msg)
 {
   if(msg->open_manipulator_moving_state == msg->IS_MOVING)
     open_manipulator_is_moving_ = true;
