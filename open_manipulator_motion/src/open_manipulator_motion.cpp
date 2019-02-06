@@ -181,19 +181,34 @@ Eigen::Matrix3d OpenManipulatorMotion::orientationSolver(Eigen::Matrix3d desired
 //  cout << "solution1: " << solution1_value << endl;
 //  cout << "solution2: " << solution2_value << endl << endl;
 
-  if(solution1_value <= solution2_value)
+  if(solution1_value < solution2_value)
     return desired_orientation1;
   else
     return desired_orientation2;
 }
 
+void timerCallback(const ros::TimerEvent&)
+{
+  int motion_case;
+
+  switch(motion_case)
+  {
+
+  }
+
+  cout << "timerrrr" << endl;
+}
+
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "open_manipulator_motion");
+  ros::NodeHandle n;
 
-  OpenManipulatorMotion openmanipulatormotion;
+  OpenManipulatorMotion om_motion;
 
   ROS_INFO("OpenManipulator Motion Node");
+
+  ros::Timer motion_timer = om_motion.node_handle_.createTimer(ros::Duration(1.0), timerCallback);
 
   ros::Rate loop_rate(100);
   while (ros::ok())

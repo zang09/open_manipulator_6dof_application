@@ -16,7 +16,17 @@
 
 #include "open_manipulator_motion/MotionState.h"
 
+#define  X_OFFSET  0.0
+#define  Y_OFFSET  0.0
 #define  Z_OFFSET  0.015
+
+#define  INIT_POSE 0
+#define  HOME_POSE 1
+#define  READY_TO_PICKUP 2
+#define  READY_TO_PUTDOWN 3
+#define  MODE_PICKUP 4
+#define  MODE_PUTDOWN 5
+#define  MODE_SCAN 100
 
 namespace open_manipulator_motion
 {
@@ -24,9 +34,6 @@ namespace open_manipulator_motion
 class OpenManipulatorMotion
 {
 private:
-  // ROS NodeHandle
-  ros::NodeHandle node_handle_;
-
   // ROS Message
   ros::Publisher open_manipulator_motion_state_pub_;
   ros::Subscriber open_manipulator_kinematics_pose_sub_;
@@ -43,7 +50,10 @@ private:
 
 public:
   OpenManipulatorMotion();
-  ~OpenManipulatorMotion();
+  ~OpenManipulatorMotion();  
+
+  // ROS NodeHandle
+  ros::NodeHandle node_handle_;
 
   void initPublisher();
   void initSubscriber();
