@@ -208,7 +208,6 @@ bool QNode::setJointSpacePath(std::vector<std::string> joint_name, std::vector<d
   {
     return srv.response.is_planned;
   }
-
   return false;
 }
 
