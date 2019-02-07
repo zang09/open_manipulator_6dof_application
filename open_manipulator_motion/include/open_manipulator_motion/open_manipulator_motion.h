@@ -26,10 +26,11 @@
 
 #define  INIT_POSE        0
 #define  HOME_POSE        1
-#define  READY_TO_PICKUP  2
-#define  READY_TO_PUTDOWN 3
-#define  MODE_PICKUP      4
-#define  MODE_PUTDOWN     5
+#define  HOME_POSE2       2
+#define  READY_TO_PICKUP  3
+#define  READY_TO_PUTDOWN 4
+#define  MODE_PICKUP      5
+#define  MODE_PUTDOWN     6
 #define  MODE_SCAN        100
 #define  MODE_END         1000
 
