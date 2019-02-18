@@ -49,8 +49,9 @@
 #include "open_manipulator_msgs/SetDrawingTrajectory.h"
 #include "open_manipulator_msgs/SetActuatorState.h"
 #include "robotis_manipulator/robotis_manipulator.h"
+#include "open_manipulator_motion/MotionState.h"
 
-#define NUM_OF_JOINT_AND_TOOL 7 //5
+#define NUM_OF_JOINT_AND_TOOL 7
 
 /*****************************************************************************
 ** Namespaces
@@ -87,6 +88,7 @@ public:
   void manipulatorStatesCallback(const open_manipulator_msgs::OpenManipulatorState::ConstPtr &msg);
   void jointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg);
   void kinematicsPoseCallback(const open_manipulator_msgs::KinematicsPose::ConstPtr &msg);
+  void motionStatesCallback(const open_manipulator_motion::MotionState::ConstPtr &msg);
 
   std::vector<double> getPresentJointAngle();
   std::vector<double> getPresentKinematicsPos();
@@ -119,10 +121,10 @@ private:
   ros::Subscriber open_manipulator_states_sub_;
   ros::Subscriber open_manipulator_joint_states_sub_;
   ros::Subscriber open_manipulator_kinematics_pose_sub_;
+  ros::Subscriber open_manipulator_motion_states_sub_;
 
   ros::ServiceClient goal_joint_space_path_client_;
   ros::ServiceClient goal_joint_space_path_to_kinematics_pose_client_;
-  //ros::ServiceClient goal_task_space_path_client_;
   ros::ServiceClient goal_task_space_path_position_only_client_;
   ros::ServiceClient goal_task_space_path_orientation_only_client_;
   ros::ServiceClient goal_task_space_path_from_present_client_;
@@ -138,6 +140,7 @@ private:
 public:
   bool open_manipulator_is_moving_;
   bool open_manipulator_actuator_enabled_;
+  int  open_manipulator_motion_state_;
 };
 
 }  // namespace open_manipulator_control_gui

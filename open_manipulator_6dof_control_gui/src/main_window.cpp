@@ -94,12 +94,16 @@ void MainWindow::timerCallback()
     ui.txt_moving_state->setText("Robot is moving");
   else
     ui.txt_moving_state->setText("Robot is stopped");
+
+  if(qnode.open_manipulator_motion_state_ == MODE_END)
+  {
+    ui.btn_control_motion->setText("START");
+    writeLog("End Motion");
+    qnode.open_manipulator_motion_state_ = 0;
+    button_state = 0;
+  }
 }
 
-void MainWindow::motion_wait(unsigned int time)
-{
-  sleep(time);
-}
 void MainWindow::tabSelected()
 {
 //  if(ui.tabWidget->currentIndex()==0)
@@ -118,14 +122,14 @@ void MainWindow::writeLog(QString str)
 
 void MainWindow::on_btn_timer_start_clicked(void)
 {        
-  start_flag = !start_flag;
+  static bool start_flag;
+
+  start_flag =! start_flag;
 
   if(start_flag)
   {
     timer = new QTimer(this);
-    m_timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(timerCallback()));
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(on_btn_pick_clicked(void)));
     timer->start(100);
 
     writeLog("QTimer start : 100ms");
@@ -144,8 +148,7 @@ void MainWindow::on_btn_timer_start_clicked(void)
     ui.btn_send_drawing_trajectory->setEnabled(true);
     ui.btn_get_manipulator_setting->setEnabled(true);
     ui.btn_set_gripper->setEnabled(true);
-    ui.btn_pick->setEnabled(true);
-    ui.btn_multi->setEnabled(true);
+    ui.btn_control_motion->setEnabled(true);    
   }
   else
   {
@@ -167,8 +170,7 @@ void MainWindow::on_btn_timer_start_clicked(void)
     ui.btn_send_drawing_trajectory->setEnabled(false);
     ui.btn_get_manipulator_setting->setEnabled(false);
     ui.btn_set_gripper->setEnabled(false);
-    ui.btn_pick->setEnabled(false);
-    ui.btn_multi->setEnabled(false);
+    ui.btn_control_motion->setEnabled(false);
   }
 }
 
@@ -560,70 +562,21 @@ void MainWindow::on_btn_control_init_ori_clicked(void)
   writeLog("Send Orientation Init");
 }
 
-void MainWindow::on_btn_pick_clicked(void)  //callback
+void MainWindow::on_btn_control_motion_clicked(void)
 {
-  m_timer->start(100);
+  button_state = !button_state;
 
-  std::vector<double> kinematics_pose1;
-  std::vector<double> joint_angle1;
-  static double path_time = 2.0;      //DEFAULT
-  kinematics_pose1.push_back(0.15);   //x
-  kinematics_pose1.push_back(-0.25);  //y
-  kinematics_pose1.push_back(0.15);   //z
-  joint_angle1.push_back(-0.01);
-
-  std::vector<double> kinematics_pose2;
-  std::vector<double> joint_angle2;
-  kinematics_pose2.push_back(0.15);   //x
-  kinematics_pose2.push_back(0.25);   //y
-  kinematics_pose2.push_back(0.15);   //z
-  joint_angle2.push_back(0.01);
-
-  std::vector<double> kinematics_pose3;
-  std::vector<double> joint_angle3;
-  kinematics_pose3.push_back(0.293);  //x
-  kinematics_pose3.push_back(0.0);    //y
-  kinematics_pose3.push_back(0.203);  //z
-  joint_angle3.push_back(0.01);
-
-  timer_cnt++;
-
-  switch(timer_cnt)
+  if(button_state)
   {
-  case 1:
-    writeLog("Send joint angle to DO motion");
-    //qnode.setTaskSpacePath(kinematics_pose1, path_time);
-    break;
-  case 21:
-    //qnode.setToolControl(joint_angle1);
-    break;
-  case 31:
-    //qnode.setTaskSpacePath(kinematics_pose2, 5.0);
-    break;
-  case 61:
-    qnode.setToolControl(joint_angle2);
-    break;
-  case 71:
-    //qnode.setTaskSpacePath(kinematics_pose3, path_time);
-    break;
-  case 91:
-    qnode.setToolControl(joint_angle3);
-  case 92:
-    m_timer->stop();
-    timer_cnt = 0;
-    break;
+    ui.btn_control_motion->setText("STOP");
+    writeLog("Start Motion");
   }
-}
-
-void MainWindow::on_btn_multi_clicked(void)
-{
-  bool button_state;
-
-  button_state = true;
-
+  else
+  {
+    ui.btn_control_motion->setText("START");
+    writeLog("Stop Motion");
+  }  
   qnode.setButtonState(button_state);
-
-  writeLog("Send Motion");
 }
 
 }  // namespace open_manipulator_control_gui

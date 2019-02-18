@@ -33,11 +33,11 @@
 #include <QTimer>
 #include <eigen3/Eigen/Eigen>
 
-#define  R2D        180/M_PI
-#define  D2R        M_PI/180
-#define  DELTA      0.015
+#define  DELTA      0.005
 #define  DELTA_ORI  0.05
 #define  PATH_TIME  0.5
+
+#define  MODE_END   1000
 
 /*****************************************************************************
 ** Namespace
@@ -91,23 +91,14 @@ public Q_SLOTS:
   void on_btn_control_p_yaw_clicked(void);
   void on_btn_control_m_yaw_clicked(void);
   void on_btn_control_init_ori_clicked(void);
-
-  void on_btn_pick_clicked(void);
-  void on_btn_multi_clicked(void);
-
+  void on_btn_control_motion_clicked(void);
   void tabSelected();
-
+public:
+  bool button_state = false;
 private:
   Ui::MainWindowDesign ui;
   QNode qnode;
   QTimer *timer;
-  QTimer *m_timer;
-
-public:
-  void motion_wait(unsigned int time);
-  bool timer_flag = false;
-  bool start_flag = false;
-  int timer_cnt;
 };
 
 }  // namespace open_manipulator_control_gui

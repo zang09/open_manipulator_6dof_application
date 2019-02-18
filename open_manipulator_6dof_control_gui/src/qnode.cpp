@@ -74,11 +74,10 @@ bool QNode::init() {
   open_manipulator_states_sub_          = n.subscribe("states", 10, &QNode::manipulatorStatesCallback, this);
   open_manipulator_joint_states_sub_    = n.subscribe("joint_states", 10, &QNode::jointStatesCallback, this);
   open_manipulator_kinematics_pose_sub_ = n.subscribe("kinematics_pose", 10, &QNode::kinematicsPoseCallback, this);
+  open_manipulator_motion_states_sub_   = n.subscribe("motion_state", 10, &QNode::motionStatesCallback, this);
   // service client
   goal_joint_space_path_client_ = n.serviceClient<open_manipulator_msgs::SetJointPosition>("goal_joint_space_path");
   goal_joint_space_path_to_kinematics_pose_client_ = n.serviceClient<open_manipulator_msgs::SetKinematicsPose>("goal_joint_space_path_to_kinematics_pose");
-
-  //goal_task_space_path_client_               = n.serviceClient<open_manipulator_msgs::SetKinematicsPose>("goal_task_space_path");
   goal_task_space_path_position_only_client_   = n.serviceClient<open_manipulator_msgs::SetKinematicsPose>("goal_task_space_path_position_only");
   goal_task_space_path_orientation_only_client_= n.serviceClient<open_manipulator_msgs::SetKinematicsPose>("goal_task_space_path_orientation_only");
   goal_task_space_path_from_present_client_    = n.serviceClient<open_manipulator_msgs::SetKinematicsPose>("goal_task_space_path_from_present");
@@ -146,6 +145,11 @@ void QNode::kinematicsPoseCallback(const open_manipulator_msgs::KinematicsPose::
   kinematics_pose_.pose = msg->pose;
 }
 
+void QNode::motionStatesCallback(const open_manipulator_motion::MotionState::ConstPtr &msg)
+{
+  open_manipulator_motion_state_ = msg->motion_state;
+}
+
 std::vector<double> QNode::getPresentJointAngle()
 {
   return present_joint_angle_;
@@ -193,16 +197,6 @@ bool QNode::setJointSpacePath(std::vector<std::string> joint_name, std::vector<d
   srv.request.joint_position.joint_name = joint_name;
   srv.request.joint_position.position = joint_angle;
   srv.request.path_time = path_time;
-
-  /*
-    for(int i=0; i<4; i++)
-    {
-        std::cout << "joint name" << 1 + i << ": " << joint_name[i] << "       ";
-        std::cout << "joint angle" << 1 + i << ": " << (double)joint_angle[i]*R2D << std::endl;
-    }
-
-    std::cout << "path_time: " << path_time << std::endl;
-    */
 
   if(goal_joint_space_path_client_.call(srv))
   {
@@ -281,10 +275,10 @@ bool QNode::setTaskSpacePathFromPresent(std::vector<double> kinematics_pose, dou
   srv.request.kinematics_pose.pose.position.y = kinematics_pose.at(1);
   srv.request.kinematics_pose.pose.position.z = kinematics_pose.at(2);
 
-  srv.request.kinematics_pose.pose.orientation.w = kinematics_pose.at(3); //kinematics_pose_.pose.orientation.w;
-  srv.request.kinematics_pose.pose.orientation.x = kinematics_pose.at(4); //kinematics_pose_.pose.orientation.x;
-  srv.request.kinematics_pose.pose.orientation.y = kinematics_pose.at(5); //kinematics_pose_.pose.orientation.y;
-  srv.request.kinematics_pose.pose.orientation.z = kinematics_pose.at(6); //kinematics_pose_.pose.orientation.z;
+  srv.request.kinematics_pose.pose.orientation.w = kinematics_pose.at(3);
+  srv.request.kinematics_pose.pose.orientation.x = kinematics_pose.at(4);
+  srv.request.kinematics_pose.pose.orientation.y = kinematics_pose.at(5);
+  srv.request.kinematics_pose.pose.orientation.z = kinematics_pose.at(6);
 
   srv.request.path_time = path_time;
 

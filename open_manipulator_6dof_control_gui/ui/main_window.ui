@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>MainWindowDesign</class>
  <widget class="QMainWindow" name="MainWindowDesign">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -14,7 +17,7 @@
    <string>OpenManipulator control GUI</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../resources/images.qrc">
+   <iconset resource="../../../open_manipulator/open_manipulator_control_gui/resources/images.qrc">
     <normaloff>:/images/icon.png</normaloff>:/images/icon.png</iconset>
   </property>
   <property name="locale">
@@ -503,7 +506,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>4</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_js">
      <property name="contextMenuPolicy">
@@ -1835,36 +1838,20 @@
      <attribute name="title">
       <string>Motion</string>
      </attribute>
-     <widget class="QPushButton" name="btn_pick">
+     <widget class="QPushButton" name="btn_control_motion">
       <property name="enabled">
        <bool>false</bool>
       </property>
       <property name="geometry">
        <rect>
-        <x>120</x>
-        <y>30</y>
+        <x>127</x>
+        <y>60</y>
         <width>151</width>
         <height>51</height>
        </rect>
       </property>
       <property name="text">
-       <string>PICK</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_multi">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>100</y>
-        <width>151</width>
-        <height>51</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>MOTION_test</string>
+       <string>START</string>
       </property>
      </widget>
     </widget>
@@ -2482,7 +2469,7 @@
   </action>
  </widget>
  <resources>
-  <include location="../resources/images.qrc"/>
+  <include location="../../../open_manipulator/open_manipulator_control_gui/resources/images.qrc"/>
  </resources>
  <connections>
   <connection>
