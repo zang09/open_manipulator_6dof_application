@@ -88,7 +88,11 @@ private:
   Eigen::Quaterniond  marker_orientation_;
   Eigen::Quaterniond  transform_marker_orientation_;
 
+  // Thread Parameter
+  pthread_t timer_thread_;
+
   //
+  bool timer_thread_state_;
   bool open_manipulator_is_moving_;
   bool open_manipulator_actuator_enabled_;
   bool marker_exist_ = false;
@@ -104,11 +108,15 @@ public:
   // ROS NodeHandle
   ros::NodeHandle node_handle_;
 
+  void startTimerThread();
+  static void *timerThread(void *param);
+
   void initPublisher();
   void initSubscriber();
   void initClient();
+  void initValue();
   void motionStatesPublisher(int motion_state);
-  void timerCallback(const ros::TimerEvent& event);
+  void timerCallback();
   void manipulatorStatesCallback(const open_manipulator_msgs::OpenManipulatorState::ConstPtr &msg);
   void jointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg);
   void kinematicsPoseCallback(const open_manipulator_msgs::KinematicsPose::ConstPtr &msg);
@@ -127,7 +135,6 @@ public:
   bool setJointSpacePathFromPresent(std::vector<std::string> joint_name, std::vector<double> joint_angle, double path_time);
   bool setTaskSpacePathFromPresent(std::vector<double> kinematics_pose, double path_time);
   bool setToolControl(std::vector<double> gripper_pose);
-  std::vector<double> markerPositionTransformer(std::vector<double> marker_position, Eigen::Quaterniond marker_orientation);
   Eigen::Quaterniond markerOrientationTransformer(Eigen::Quaterniond marker_orientation);
   Eigen::Matrix3d orientationSolver(Eigen::Matrix3d desired_orientation1, Eigen::Matrix3d desired_orientation2, Eigen::Matrix3d present_orientation);
 

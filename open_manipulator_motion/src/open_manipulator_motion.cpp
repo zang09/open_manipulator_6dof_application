@@ -25,16 +25,42 @@ OpenManipulatorMotion::OpenManipulatorMotion()
   initPublisher();
   initSubscriber();
   initClient();
+  startTimerThread();
 }
 
 OpenManipulatorMotion::~OpenManipulatorMotion()
 {
-  ros::shutdown();
+  timer_thread_state_ = false;
+  pthread_join(timer_thread_, NULL);
+  ros::shutdown(); // explicitly needed since we use ros::start();
+
 //  if(ros::isStarted()) {
-//    ros::shutdown(); // explicitly needed since we use ros::start();
+//    ros::shutdown();
 //    ros::waitForShutdown();
 //  }
 //  wait();
+}
+
+void OpenManipulatorMotion::startTimerThread()
+{
+  int error;
+  if ((error = pthread_create(&this->timer_thread_, NULL, this->timerThread, this)) != 0)
+  {
+    log::error("Creating timer thread failed!!", (double)error);
+    exit(-1);
+  }
+  timer_thread_state_ = true;
+}
+
+void *OpenManipulatorMotion::timerThread(void *param)
+{
+  OpenManipulatorMotion *om_motion = (OpenManipulatorMotion *) param;
+
+  while(om_motion->timer_thread_state_)
+  {
+    om_motion->timerCallback();
+  }
+  return 0;
 }
 
 void OpenManipulatorMotion::initPublisher()
@@ -61,6 +87,14 @@ void OpenManipulatorMotion::initClient()
   goal_tool_control_client_                        = node_handle_.serviceClient<open_manipulator_msgs::SetJointPosition>("goal_tool_control");
 }
 
+void OpenManipulatorMotion::initValue()
+{
+  motion_case = INIT_POSE;
+  motion_cnt = MOTION_NUM;
+  layer_cnt = LAYER_NUM;
+  send_flag = true;
+}
+
 void OpenManipulatorMotion::motionStatesPublisher(int motion_state)
 {
   open_manipulator_motion::MotionState msg;
@@ -68,7 +102,7 @@ void OpenManipulatorMotion::motionStatesPublisher(int motion_state)
   open_manipulator_motion_state_pub_.publish(msg);
 }
 
-void OpenManipulatorMotion::timerCallback(const ros::TimerEvent& event)
+void OpenManipulatorMotion::timerCallback()
 {
   static vector<double> temp_position;
   static Eigen::Quaterniond temp_orientation;
@@ -134,6 +168,7 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent& event)
 
 
     case MODE_CAM_INIT:
+      cout << "missing_cnt: " << missing_cnt << endl;
       temp_camera_x = camera_x_;
       temp_camera_y = camera_y_;
       goal_camera_x = 0.0; //3.7
@@ -144,19 +179,17 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent& event)
       else
         missing_cnt = 0;
 
-      if(missing_cnt > 40)
+      if(missing_cnt > 50)
       {
         missing_cnt = 0;
         motion_case = MODE_MARKER_DETECT;
       }
 
-      sendJointFromPresent(JOINT1, -(temp_camera_x-goal_camera_x)*D2R/1.0, 0.5);
-      sendJointFromPresent(JOINT5, (temp_camera_y-goal_camera_y)*D2R/1.5, 0.5);
+      sendJointFromPresent(JOINT1, -(temp_camera_x-goal_camera_x)*D2R/8, 0.05);
+      sendJointFromPresent(JOINT5, (temp_camera_y-goal_camera_y)*D2R/10, 0.05);
 
-      if(abs(temp_camera_x - goal_camera_x) < 1.0 && abs(temp_camera_y - goal_camera_y) < 1.0)
+      if(abs(temp_camera_x - goal_camera_x) < 3.0 && abs(temp_camera_y - goal_camera_y) < 3.0) //1.0
       {
-        cout << "temp_camera_x: " << temp_camera_x-goal_camera_x << endl;
-        cout << "temp_camera_y: " << temp_camera_y-goal_camera_y << endl << endl;
         motionWait(1.0);
         motion_case = READY_TO_PICKUP;
       }
@@ -168,7 +201,7 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent& event)
       {
         temp_position = marker_position_;
         temp_orientation = transform_marker_orientation_;
-        sendMarkerPose(temp_position, temp_orientation, -0.03);
+        sendMarkerPose(temp_position, temp_orientation, -0.04);
         if(open_manipulator_is_moving_)
           send_flag = false;
         else
@@ -195,7 +228,7 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent& event)
       if(send_flag)
       {
         temp_orientation = transform_marker_orientation_;
-        sendEndEffectorFromPresent(temp_orientation, 0.04);
+        sendEndEffectorFromPresent(temp_orientation, 0.035);
         if(open_manipulator_is_moving_)
           send_flag = false;
       }
@@ -215,7 +248,7 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent& event)
       if(send_flag)
       {
         temp_orientation = transform_marker_orientation_;
-        sendEndEffectorFromPresent(temp_orientation, -0.04);
+        sendEndEffectorFromPresent(temp_orientation, -0.035);
         if(open_manipulator_is_moving_)
           send_flag = false;
       }
@@ -497,10 +530,7 @@ void OpenManipulatorMotion::buttonStatesCallback(const std_msgs::Bool::ConstPtr 
 
   if(motion_flag)
   {
-    motion_case = INIT_POSE;
-    motion_cnt = MOTION_NUM;
-    layer_cnt = LAYER_NUM;
-    send_flag = true;
+    initValue();
   }
 }
 
@@ -772,13 +802,13 @@ void OpenManipulatorMotion::motionWait(double second)
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "open_manipulator_motion");
-  ros::NodeHandle n;
+  //ros::NodeHandle n;
 
   OpenManipulatorMotion om_motion;
 
   ROS_INFO("OpenManipulator Motion Node");
 
-  ros::Timer motion_timer = n.createTimer(ros::Duration(0.01), &OpenManipulatorMotion::timerCallback, &om_motion);
+  //ros::Timer motion_timer = n.createTimer(ros::Duration(0.01), &OpenManipulatorMotion::timerCallback, &om_motion);
 
   //  ros::Rate loop_rate(100);
   //  while (ros::ok())
