@@ -19,22 +19,16 @@
 
 #define  NUM_OF_JOINT_AND_TOOL 7
 
-#define  JOINT1             1
-#define  JOINT2             2
-#define  JOINT3             3
-#define  JOINT4             4
-#define  JOINT5             5
-#define  JOINT6             6
+#define  JOINT1             0
+#define  JOINT2             1
+#define  JOINT3             2
+#define  JOINT4             3
+#define  JOINT5             4
+#define  JOINT6             5
 
 #define  X_AXIS             0
 #define  Y_AXIS             1
 #define  Z_AXIS             2
-
-#define  X_OFFSET           0.0
-#define  Y_OFFSET           0.0
-#define  Z_OFFSET           0.0
-#define  ROLL_OFFSET        0.0
-#define  PITCH_OFFSET       0.0
 
 #define  MOTION_NUM         1
 #define  LAYER_NUM          1
@@ -84,22 +78,19 @@ private:
 
   // Marker variable
   std::vector<double> marker_position_;
-  std::vector<double> transform_marker_position_;
   Eigen::Quaterniond  marker_orientation_;
-  Eigen::Quaterniond  transform_marker_orientation_;
 
-  // Thread Parameter
-  pthread_t timer_thread_;
-
-  //
-  bool timer_thread_state_;
-  bool open_manipulator_is_moving_;
-  bool open_manipulator_actuator_enabled_;
-  bool marker_exist_ = false;
+  // Camera variable
   double camera_x_;
   double camera_y_;
   double pan_position_;
   double tilt_position_;
+
+  // Flag parameter
+  bool open_manipulator_is_moving_;
+  bool open_manipulator_actuator_enabled_;
+  bool marker_exist_;
+
 
 public:
   OpenManipulatorMotion();
@@ -108,26 +99,26 @@ public:
   // ROS NodeHandle
   ros::NodeHandle node_handle_;
 
-  void startTimerThread();
-  static void *timerThread(void *param);
+  ros::Timer      motion_timer;
 
   void initPublisher();
   void initSubscriber();
   void initClient();
   void initValue();
   void motionStatesPublisher(int motion_state);
-  void timerCallback();
+  void timerCallback(const ros::TimerEvent &);
+  void visualMarkerCallback(const visualization_msgs::Marker::ConstPtr &msg);
+  void markerPosCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr &msg);
   void manipulatorStatesCallback(const open_manipulator_msgs::OpenManipulatorState::ConstPtr &msg);
+  void buttonStatesCallback(const std_msgs::Bool::ConstPtr &msg);
   void jointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg);
   void kinematicsPoseCallback(const open_manipulator_msgs::KinematicsPose::ConstPtr &msg);
-  void buttonStatesCallback(const std_msgs::Bool::ConstPtr &msg);
-  void markerPosCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr &msg);
-  void visualMarkerCallback(const visualization_msgs::Marker::ConstPtr &msg);
-  void sendJointAngle(double joint1, double joint2, double joint3, double joint4, double joint5, double joint6);  
+  void sendJointAngle(double joint1, double joint2, double joint3, double joint4, double joint5, double joint6, double path_time);
   void sendJointFromPresent(int joint_num, double delta, double path_time);
   void sendPoseFromPresent(double delta_x, double delta_y, double delta_z);
+  void sendPanTiltFromPresent(double delta_x, double delta_y);
   void sendEndEffectorFromPresent(Eigen::Quaterniond orientation, double delta_z);
-  void sendMarkerPose(std::vector<double> position, Eigen::Quaterniond orientation, double delta_z);
+  void sendMarkerPose(std::vector<double> position, Eigen::Quaterniond transform_orientation, double delta_z);
   void sendGripperAngle(double gripper);
   void motionWait(double second);
   bool setJointSpacePath(std::vector<std::string> joint_name, std::vector<double> joint_angle, double path_time);
@@ -138,16 +129,17 @@ public:
   Eigen::Quaterniond markerOrientationTransformer(Eigen::Quaterniond marker_orientation);
   Eigen::Matrix3d orientationSolver(Eigen::Matrix3d desired_orientation1, Eigen::Matrix3d desired_orientation2, Eigen::Matrix3d present_orientation);
 
-public:    
-  bool motion_flag = false;
-  bool send_flag = true;
-  int motion_state = 0;
-  int motion_case = INIT_POSE;
-  int motion_cnt = 0;
-  int repeat_motion_cnt = 0;
-  int layer_cnt = 0;
-  int pan_flag = 1;
-  int tilt_flag = 0;
+
+public:
+  bool send_flag;
+  bool motion_flag;
+  int motion_case;
+  int motion_cnt;
+  int layer_cnt;
+  int repeat_motion_cnt;
+  int solution_flag;
+  int pan_flag;
+  int tilt_flag;
 };
 }
 
