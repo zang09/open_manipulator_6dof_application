@@ -5,7 +5,6 @@
 #include <std_msgs/Bool.h>
 #include <eigen3/Eigen/Eigen>
 #include <sensor_msgs/JointState.h>
-#include <boost/thread.hpp>
 
 #include "ar_track_alvar_msgs/AlvarMarkers.h"
 #include "visualization_msgs/Marker.h"
@@ -19,33 +18,28 @@
 
 #define  NUM_OF_JOINT_AND_TOOL 7
 
-#define  JOINT1             0
-#define  JOINT2             1
-#define  JOINT3             2
-#define  JOINT4             3
-#define  JOINT5             4
-#define  JOINT6             5
+#define  JOINT1                0
+#define  JOINT2                1
+#define  JOINT3                2
+#define  JOINT4                3
+#define  JOINT5                4
+#define  JOINT6                5
 
-#define  X_AXIS             0
-#define  Y_AXIS             1
-#define  Z_AXIS             2
+#define  MOTION_NUM            1
+#define  LAYER_NUM             1
 
-#define  MOTION_NUM         1
-#define  LAYER_NUM          1
-
-#define  INIT_POSE          0
-#define  HOME_POSE          1
-#define  HOME_POSE2         2
-#define  READY_TO_PICKUP    3
-#define  READY_TO_PUTDOWN   4
-#define  MODE_PICKUP        5
-#define  MODE_PUTDOWN       6
-#define  ORIENTATION_CHECK  7
-#define  MODE_MARKER_DETECT 10
-#define  MODE_CAM_INIT      50
-#define  MODE_SCAN          100
-#define  MODE_FAIL_MOTION   500
-#define  MODE_END           1000
+#define  INIT_POSE             1
+#define  MODE_MARKER_DETECT    2
+#define  MODE_CAM_INIT         3
+#define  READY_TO_PICKUP       4
+#define  MODE_PICKUP           5
+#define  HOME_POSE             6
+#define  READY_TO_PUTDOWN      7
+#define  MODE_PUTDOWN          8
+#define  HOME_POSE2            9
+#define  MODE_SCAN             10
+#define  MODE_FAIL_MOTION      100
+#define  MODE_END              1000
 
 namespace open_manipulator_motion
 {
@@ -69,12 +63,12 @@ private:
   ros::ServiceClient goal_task_space_path_from_present_client_;
   ros::ServiceClient goal_tool_control_client_;
 
-  // Kinematics variable
-  std::vector<double> present_joint_angle_;
+  // Kinematics variable  
   open_manipulator_msgs::KinematicsPose kinematics_pose_;
-  Eigen::Quaterniond kinematics_orientation_;
-  Eigen::Vector3d    kinematics_orientation_rpy_;
-  Eigen::Matrix3d    kinematics_orientation_matrix_;
+  std::vector<double>                   present_joint_angle_;
+  Eigen::Quaterniond                    kinematics_orientation_;
+  Eigen::Vector3d                       kinematics_orientation_rpy_;
+  Eigen::Matrix3d                       kinematics_orientation_matrix_;
 
   // Marker variable
   std::vector<double> marker_position_;
@@ -133,13 +127,13 @@ public:
 public:
   bool send_flag;
   bool motion_flag;
-  int motion_case;
-  int motion_cnt;
-  int layer_cnt;
-  int repeat_motion_cnt;
-  int solution_flag;
-  int pan_flag;
-  int tilt_flag;
+  int  motion_case;
+  int  motion_cnt;
+  int  layer_cnt;
+  int  repeat_motion_cnt;
+  int  solution_flag;
+  int  pan_flag;
+  int  tilt_flag;
 };
 }
 
