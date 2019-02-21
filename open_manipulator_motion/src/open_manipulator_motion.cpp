@@ -63,6 +63,7 @@ void OpenManipulatorMotion::initClient()
 void OpenManipulatorMotion::initValue()
 {
   marker_exist_ = false;
+  get_marker_id = 1000;
   send_flag = true;
   motion_case = INIT_POSE;
   motion_cnt = MOTION_NUM;
@@ -102,7 +103,7 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
       if(send_flag)
       {
         sendJointAngle(-PI/2, -0.6, 1.52, 0.0, 2.0, 0.0, 2.0);
-        sendGripperAngle(0.005);
+        sendGripperAngle(0.003);  //0.005
         if(open_manipulator_is_moving_)
           send_flag = false;
       }
@@ -146,11 +147,6 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
 
 
     case MODE_CAM_INIT:
-      temp_camera_x = camera_x_;
-      temp_camera_y = camera_y_;
-      goal_camera_x = 0.0;
-      goal_camera_y = 0.0;
-
       if(!marker_exist_)
         missing_cnt++;
       else
@@ -162,22 +158,31 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
         motion_case = MODE_MARKER_DETECT;
       }
 
-      sendPanTiltFromPresent(-(temp_camera_x-goal_camera_x)*D2R/5.0, (temp_camera_y-goal_camera_y)*D2R/8.0);
-
-      if(abs(temp_camera_x - goal_camera_x) < 1.0 && abs(temp_camera_y - goal_camera_y) < 1.0) //1.0
+      if(get_marker_id == marker_id_)
       {
-        motionWait(1.5);
-        motion_case = READY_TO_PICKUP;
-      }
-      break;
+        goal_camera_x = 0.0;
+        goal_camera_y = 0.0;
+        temp_camera_x = camera_x_;
+        temp_camera_y = camera_y_;
 
+        sendPanTiltFromPresent(-(temp_camera_x-goal_camera_x)*D2R/5.0, (temp_camera_y-goal_camera_y)*D2R/8.0);
+
+        if(abs(temp_camera_x - goal_camera_x) < 1.0 && abs(temp_camera_y - goal_camera_y) < 1.0) //1.0
+        {
+          motionWait(1.5);
+          motion_case = READY_TO_PICKUP;
+        }
+      }
+      else
+        get_marker_id = marker_id_;
+      break;
 
     case READY_TO_PICKUP:
       if(send_flag)
-      {
+      {        
         temp_position = marker_position_;
         temp_orientation = markerOrientationTransformer(marker_orientation_);
-        sendMarkerPose(temp_position, temp_orientation, -0.035);
+        sendMarkerPose(temp_position, temp_orientation, 0, 0, -0.035);
         if(open_manipulator_is_moving_)
           send_flag = false;
         else
@@ -228,7 +233,7 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
       }
       else if(!open_manipulator_is_moving_)
       {
-        sendJointAngle(0.0, 0.0, PI/2, 0.0, PI/2, 0.0, 2.0);
+        sendJointAngle(0.0, -0.58, 1.8, 0.0, 0.4, 0.0, 2.0);
         send_flag = true;
         motion_case = READY_TO_PUTDOWN;
         motionWait(1.5);
@@ -282,7 +287,7 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
         sendGripperAngle(0.0);
         send_flag = true;
         motion_case = HOME_POSE2;
-        motionWait(0.5);
+        motionWait(1.0);
       }
       break;
 
@@ -314,7 +319,7 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
           sendJointFromPresent(JOINT5, -PI/8, 0.8);
           motionWait(0.8);
         }
-        sendJointAngle(0.0, 0.0, PI/2, 0.0, PI/2, 0.0, 2.0);
+        sendJointAngle(0.0, -0.58, 1.8, 0.0, 0.4, 0.0, 2.0);
         send_flag = true;
         motion_cnt++;
 
@@ -333,7 +338,7 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
       else
         marker_cnt = 0;
 
-      if(marker_cnt > 5)
+      if(marker_cnt > 3)
       {
         marker_cnt = 0;
         motion_case = MODE_MARKER_DETECT;
@@ -341,14 +346,14 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
 
       if(pan_flag == 1)
       {
-        sendJointAngle(-PI/2, -0.6, 1.52, 0.0, 2.0, 0.0, 1.0);
+        sendJointAngle(-PI/2, -0.6, 1.52, 0.0, 2.0, 0.0, 1.5);
         motionWait(1.0);
         pan_flag = 2;
       }
       else if(pan_flag == 2)  // Go To Right
       {
-        sendJointFromPresent(JOINT1, -3.2*D2R, 0.1);
-        if(pan_position_ < -145.0)
+        sendJointFromPresent(JOINT1, -2.5*D2R, 0.1);
+        if(pan_position_ < -135.0)
         {
           pan_flag = 0;
           tilt_flag = 1;
@@ -356,8 +361,8 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
       }
       else if(pan_flag == 3)  // Go To Left
       {
-        sendJointFromPresent(JOINT1, 3.2*D2R, 0.1);
-        if(pan_position_ > -35.0)
+        sendJointFromPresent(JOINT1, 2.5*D2R, 0.1);
+        if(pan_position_ > -45.0)
         {
           pan_flag = 0;
           tilt_flag = 2;
@@ -366,7 +371,7 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
 
       if(tilt_flag == 1)      //UP
       {
-        sendJointFromPresent(JOINT5, -2.0*D2R, 0.1);
+        sendJointFromPresent(JOINT5, -1.5*D2R, 0.1);
         if(tilt_position_ < 100)
         {
           tilt_flag = 0;
@@ -375,7 +380,7 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
       }
       else if(tilt_flag == 2) //DOWN
       {
-        sendJointFromPresent(JOINT5, 2.0*D2R, 0.1);
+        sendJointFromPresent(JOINT5, 1.5*D2R, 0.1);
         if(tilt_position_ >= 110)
         {
           tilt_flag = 0;
@@ -390,7 +395,9 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
       {
         repeat_motion_cnt = 0;
         send_flag = true;
-        motion_case = MODE_MARKER_DETECT;
+        pan_flag = 1;
+        tilt_flag = 0;
+        motion_case = MODE_SCAN;
       }
       else if(send_flag)
       {
@@ -417,7 +424,7 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
 
 
     case MODE_END:
-      //sendJointAngle(0.0, 0.0, 0.0, 0.0, 1.57, 0.0, 2.0);
+      sendJointAngle(0.0, 0.0, 0.0, 0.0, 1.57, 0.0, 2.0);
       motion_flag = false;
       motionStatesPublisher(MODE_END);
       break;
@@ -427,30 +434,44 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
 
 void OpenManipulatorMotion::visualMarkerCallback(const visualization_msgs::Marker::ConstPtr &msg)
 {
-  camera_x_ = msg->pose.position.x*100.0;
-  camera_y_ = msg->pose.position.y*100.0;
+  camera_x_  = msg->pose.position.x*100.0;
+  camera_y_  = msg->pose.position.y*100.0;
+  marker_id_ = msg->id;
 }
 
 void OpenManipulatorMotion::markerPosCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr &msg)
 {
   std::vector<double> temp_position;
+  int get_marker_size;
 
   if(!(msg->markers.empty()))
   {
     marker_exist_ = true;
+    get_marker_size = msg->markers.size();
 
-    //Get Position
-    temp_position.push_back(msg->markers.at(0).pose.pose.position.x);
-    temp_position.push_back(msg->markers.at(0).pose.pose.position.y);
-    temp_position.push_back(msg->markers.at(0).pose.pose.position.z);
-    marker_position_ = temp_position;
+    //Scan ID
+    for(int i=0; i<get_marker_size; i++)
+    {
+      if(get_marker_id == msg->markers.at(i).id)
+      {
+        //Get Position
+        temp_position.push_back(msg->markers.at(i).pose.pose.position.x);
+        temp_position.push_back(msg->markers.at(i).pose.pose.position.y);
+        temp_position.push_back(msg->markers.at(i).pose.pose.position.z);
+        marker_position_ = temp_position;
 
-    //Get Orientation
-    Eigen::Quaterniond temp_orientation(msg->markers.at(0).pose.pose.orientation.w, msg->markers.at(0).pose.pose.orientation.x, msg->markers.at(0).pose.pose.orientation.y, msg->markers.at(0).pose.pose.orientation.z);
-    marker_orientation_ = temp_orientation;
+        //Get Orientation
+        Eigen::Quaterniond temp_orientation(msg->markers.at(i).pose.pose.orientation.w, msg->markers.at(i).pose.pose.orientation.x, msg->markers.at(i).pose.pose.orientation.y, msg->markers.at(i).pose.pose.orientation.z);
+        marker_orientation_ = temp_orientation;
+        break;
+      }
+    }
   }
   else
+  {
     marker_exist_ = false;
+    get_marker_id = 1000;
+  }
 }
 
 void OpenManipulatorMotion::manipulatorStatesCallback(const open_manipulator_msgs::OpenManipulatorState::ConstPtr &msg)
@@ -612,7 +633,7 @@ void OpenManipulatorMotion::sendEndEffectorFromPresent(Eigen::Quaterniond orient
   }
 }
 
-void OpenManipulatorMotion::sendMarkerPose(std::vector<double> position, Eigen::Quaterniond transform_orientation, double delta_z)
+void OpenManipulatorMotion::sendMarkerPose(std::vector<double> position, Eigen::Quaterniond transform_orientation, double delta_x, double delta_y, double delta_z)
 {
   Eigen::Vector3d delta_position_vector;
   std::vector<double> delta_position;
@@ -620,7 +641,7 @@ void OpenManipulatorMotion::sendMarkerPose(std::vector<double> position, Eigen::
   std::vector<double> kinematics_pose;
   static double path_time = 2.0;
 
-  delta_position_vector = math::convertQuaternionToRotationMatrix(transform_orientation)*math::convertXYZToVector(0,0,delta_z);
+  delta_position_vector = math::convertQuaternionToRotationMatrix(transform_orientation)*math::convertXYZToVector(delta_x, delta_y, delta_z);
   delta_position.push_back(delta_position_vector.coeff(0,0));
   delta_position.push_back(delta_position_vector.coeff(1,0));
   delta_position.push_back(delta_position_vector.coeff(2,0));
@@ -836,12 +857,6 @@ int main(int argc, char **argv)
 
   om_motion.motion_timer = n.createTimer(ros::Duration(0.05), &OpenManipulatorMotion::timerCallback, &om_motion);
   om_motion.motion_timer.stop();
-  //  ros::Rate loop_rate(100);
-  //  while (ros::ok())
-  //  {
-  //    ros::spinOnce();
-  //    loop_rate.sleep();
-  //  }
 
   ros::spin();
   return 0;

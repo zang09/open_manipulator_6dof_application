@@ -75,6 +75,7 @@ private:
   Eigen::Quaterniond  marker_orientation_;
 
   // Camera variable
+  int    marker_id_;
   double camera_x_;
   double camera_y_;
   double pan_position_;
@@ -112,7 +113,7 @@ public:
   void sendPoseFromPresent(double delta_x, double delta_y, double delta_z);
   void sendPanTiltFromPresent(double delta_x, double delta_y);
   void sendEndEffectorFromPresent(Eigen::Quaterniond orientation, double delta_z);
-  void sendMarkerPose(std::vector<double> position, Eigen::Quaterniond transform_orientation, double delta_z);
+  void sendMarkerPose(std::vector<double> position, Eigen::Quaterniond transform_orientation, double delta_x, double delta_y, double delta_z);
   void sendGripperAngle(double gripper);
   void motionWait(double second);
   bool setJointSpacePath(std::vector<std::string> joint_name, std::vector<double> joint_angle, double path_time);
@@ -132,6 +133,7 @@ public:
   int  layer_cnt;
   int  repeat_motion_cnt;
   int  solution_flag;
+  int  get_marker_id;
   int  pan_flag;
   int  tilt_flag;
 };
