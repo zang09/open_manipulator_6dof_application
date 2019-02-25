@@ -147,6 +147,7 @@ void MainWindow::on_btn_timer_start_clicked(void)
     ui.btn_send_kinematic_pose->setEnabled(true);
     ui.btn_send_drawing_trajectory->setEnabled(true);
     ui.btn_get_manipulator_setting->setEnabled(true);
+    ui.btn_switching_kinematics_setting->setEnabled(true);
     ui.btn_set_gripper->setEnabled(true);
     ui.btn_control_motion->setEnabled(true);    
   }
@@ -169,6 +170,7 @@ void MainWindow::on_btn_timer_start_clicked(void)
     ui.btn_send_kinematic_pose->setEnabled(false);
     ui.btn_send_drawing_trajectory->setEnabled(false);
     ui.btn_get_manipulator_setting->setEnabled(false);
+    ui.btn_switching_kinematics_setting->setEnabled(false);
     ui.btn_set_gripper->setEnabled(false);
     ui.btn_control_motion->setEnabled(false);
   }
@@ -359,6 +361,20 @@ void MainWindow::on_btn_get_manipulator_setting_clicked(void)
 {
   qnode.setOption("print_open_manipulator_setting");
   writeLog("Check the terminal of open_manipulator_controller package");
+}
+
+void MainWindow::on_btn_switching_kinematics_setting_clicked(void)
+{
+  static bool kinematics_flag;
+
+  kinematics_flag = !kinematics_flag;
+
+  qnode.setOption("switching_kinematics");
+
+  if(kinematics_flag)
+    writeLog("Kinematics: SolverUsingCRAndSRPositionOnlyJacobian");
+  else
+    writeLog("Kinematics: SolverUsingCRAndSRJacobian");
 }
 
 void MainWindow::on_radio_drawing_line_clicked(void)

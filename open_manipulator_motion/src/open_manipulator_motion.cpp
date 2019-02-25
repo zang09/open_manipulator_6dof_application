@@ -39,6 +39,7 @@ OpenManipulatorMotion::~OpenManipulatorMotion()
 void OpenManipulatorMotion::initPublisher()
 {
   open_manipulator_motion_state_pub_ = node_handle_.advertise<open_manipulator_motion::MotionState>("motion_state", 10);
+  open_manipulator_option_pub_       = node_handle_.advertise<std_msgs::String>("option", 10);
 }
 
 void OpenManipulatorMotion::initSubscriber()
@@ -58,20 +59,21 @@ void OpenManipulatorMotion::initClient()
   goal_joint_space_path_from_present_client_       = node_handle_.serviceClient<open_manipulator_msgs::SetJointPosition>("goal_joint_space_path_from_present");
   goal_task_space_path_from_present_client_        = node_handle_.serviceClient<open_manipulator_msgs::SetKinematicsPose>("goal_task_space_path_from_present");
   goal_tool_control_client_                        = node_handle_.serviceClient<open_manipulator_msgs::SetJointPosition>("goal_tool_control");
+  goal_drawing_trajectory_client_                  = node_handle_.serviceClient<open_manipulator_msgs::SetDrawingTrajectory>("goal_drawing_trajectory");
 }
 
 void OpenManipulatorMotion::initValue()
 {
   marker_exist_ = false;
   get_marker_id = 1000;
-  send_flag = true;
-  motion_case = INIT_POSE;
-  motion_cnt = MOTION_NUM;
-  layer_cnt = LAYER_NUM;
-  repeat_motion_cnt = 0;
-  pan_flag = 1;
-  tilt_flag = 0;
+  send_flag     = true;
+  pan_flag      = 1;
+  tilt_flag     = 0;
   solution_flag = 0;
+  motion_case   = HOME_POSE2;  //INIT_POSE
+  motion_cnt    = 10;   //MOTION_NUM
+  layer_cnt     = 3; //LAYER_NUM
+  repeat_motion_cnt = 0;
 }
 
 void OpenManipulatorMotion::motionStatesPublisher(int motion_state)
@@ -79,6 +81,13 @@ void OpenManipulatorMotion::motionStatesPublisher(int motion_state)
   open_manipulator_motion::MotionState msg;
   msg.motion_state = motion_state;
   open_manipulator_motion_state_pub_.publish(msg);
+}
+
+void OpenManipulatorMotion::optionPublisher(std::string opt)
+{
+  std_msgs::String msg;
+  msg.data = opt;
+  open_manipulator_option_pub_.publish(msg);
 }
 
 void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
@@ -319,15 +328,21 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
           sendJointFromPresent(JOINT5, -PI/8, 0.8);
           motionWait(0.8);
         }
-        sendJointAngle(0.0, -0.58, 1.8, 0.0, 0.4, 0.0, 2.0);
         send_flag = true;
         motion_cnt++;
 
         if(motion_cnt > 10)
-          motion_case = MODE_END;
+        {
+          sendJointAngle(0.0, -0.78, 1.5, 0.0, 0.8, 0.0, 2.0);
+          motionWait(2.2);
+          motion_case = MODE_SUCCESS_MOTION;
+        }
         else
+        {
+          sendJointAngle(0.0, -0.58, 1.8, 0.0, 0.4, 0.0, 2.0);
+          motionWait(1.5);
           motion_case = INIT_POSE;
-        motionWait(1.5);
+        }
       }
       break;
 
@@ -423,8 +438,23 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
       break;
 
 
+    case MODE_SUCCESS_MOTION:
+      if(send_flag)
+      {        
+        optionPublisher("switching_kinematics");
+        sendDrawingTrajectory(0.08, 2.0, 0.0, 3.0);        
+        send_flag = false;
+      }
+      else if(!open_manipulator_is_moving_)
+      {
+        optionPublisher("switching_kinematics");
+        sendJointAngle(0.0, -0.78, 1.5, 0.0, 0.8, 0.0, 2.0);
+        motion_case = MODE_END;
+      }
+      break;
+
+
     case MODE_END:
-      sendJointAngle(0.0, 0.0, 0.0, 0.0, 1.57, 0.0, 2.0);
       motion_flag = false;
       motionStatesPublisher(MODE_END);
       break;
@@ -691,6 +721,23 @@ void OpenManipulatorMotion::sendGripperAngle(double gripper)
   }
 }
 
+void OpenManipulatorMotion::sendDrawingTrajectory(double radius, double revolution, double start_angle, double path_time)
+{
+  std::string name;
+  std::vector<double> arg;
+
+  name = "circle";
+  arg.push_back(radius);
+  arg.push_back(revolution);
+  arg.push_back(start_angle);
+
+  if(!setDrawingTrajectory(name, arg, path_time))
+  {
+    ROS_ERROR("Fail to send service!");
+    return;
+  }
+}
+
 bool OpenManipulatorMotion::setJointSpacePath(std::vector<std::string> joint_name, std::vector<double> joint_angle, double path_time)
 {
   open_manipulator_msgs::SetJointPosition srv;
@@ -780,6 +827,24 @@ bool OpenManipulatorMotion::setToolControl(std::vector<double> gripper_pose)
   return false;
 }
 
+bool OpenManipulatorMotion::setDrawingTrajectory(std::string name, std::vector<double> arg, double path_time)
+{
+  open_manipulator_msgs::SetDrawingTrajectory srv;
+
+  srv.request.end_effector_name = "gripper";
+  srv.request.drawing_trajectory_name = name;
+  srv.request.path_time = path_time;
+
+  for(int i = 0; i < arg.size(); i ++)
+    srv.request.param.push_back(arg.at(i));
+
+  if(goal_drawing_trajectory_client_.call(srv))
+  {    
+    return srv.response.is_planned;
+  }
+  return false;
+}
+
 Eigen::Quaterniond OpenManipulatorMotion::markerOrientationTransformer(Eigen::Quaterniond marker_orientation)
 {//Transform marker orientation to end effector
 
@@ -829,13 +894,13 @@ Eigen::Matrix3d OpenManipulatorMotion::orientationSolver(Eigen::Matrix3d desired
   if(solution1_value < solution2_value)
   {
     solution_flag = 1;
-    std::cout << "solution1" << std::endl;
+    //std::cout << "solution1" << std::endl;
     return desired_orientation1;
   }
   else
   {
     solution_flag = 2;
-    std::cout << "solution2" << std::endl;
+    //std::cout << "solution2" << std::endl;
     return desired_orientation2;
   }
 }

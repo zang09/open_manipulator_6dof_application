@@ -3,6 +3,7 @@
 
 #include <ros/ros.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/String.h>
 #include <eigen3/Eigen/Eigen>
 #include <sensor_msgs/JointState.h>
 
@@ -39,6 +40,7 @@
 #define  HOME_POSE2            9
 #define  MODE_SCAN             10
 #define  MODE_FAIL_MOTION      100
+#define  MODE_SUCCESS_MOTION   200
 #define  MODE_END              1000
 
 namespace open_manipulator_motion
@@ -49,6 +51,7 @@ class OpenManipulatorMotion
 private:
   // ROS Message
   ros::Publisher  open_manipulator_motion_state_pub_;
+  ros::Publisher  open_manipulator_option_pub_;
   ros::Subscriber open_manipulator_states_sub_;
   ros::Subscriber open_manipulator_joint_states_sub_;
   ros::Subscriber open_manipulator_kinematics_pose_sub_;
@@ -62,6 +65,7 @@ private:
   ros::ServiceClient goal_joint_space_path_from_present_client_;
   ros::ServiceClient goal_task_space_path_from_present_client_;
   ros::ServiceClient goal_tool_control_client_;
+  ros::ServiceClient goal_drawing_trajectory_client_;
 
   // Kinematics variable  
   open_manipulator_msgs::KinematicsPose kinematics_pose_;
@@ -101,6 +105,7 @@ public:
   void initClient();
   void initValue();
   void motionStatesPublisher(int motion_state);
+  void optionPublisher(std::string opt);
   void timerCallback(const ros::TimerEvent &);
   void visualMarkerCallback(const visualization_msgs::Marker::ConstPtr &msg);
   void markerPosCallback(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr &msg);
@@ -115,12 +120,14 @@ public:
   void sendEndEffectorFromPresent(Eigen::Quaterniond orientation, double delta_z);
   void sendMarkerPose(std::vector<double> position, Eigen::Quaterniond transform_orientation, double delta_x, double delta_y, double delta_z);
   void sendGripperAngle(double gripper);
+  void sendDrawingTrajectory(double radius, double revolution, double start_angle, double path_time);
   void motionWait(double second);
   bool setJointSpacePath(std::vector<std::string> joint_name, std::vector<double> joint_angle, double path_time);
   bool setJointSpacePathToKinematicsPose(std::vector<double> kinematics_pose, double path_time);
   bool setJointSpacePathFromPresent(std::vector<std::string> joint_name, std::vector<double> joint_angle, double path_time);
   bool setTaskSpacePathFromPresent(std::vector<double> kinematics_pose, double path_time);
   bool setToolControl(std::vector<double> gripper_pose);
+  bool setDrawingTrajectory(std::string name, std::vector<double> arg, double path_time);
   Eigen::Quaterniond markerOrientationTransformer(Eigen::Quaterniond marker_orientation);
   Eigen::Matrix3d orientationSolver(Eigen::Matrix3d desired_orientation1, Eigen::Matrix3d desired_orientation2, Eigen::Matrix3d present_orientation);
 

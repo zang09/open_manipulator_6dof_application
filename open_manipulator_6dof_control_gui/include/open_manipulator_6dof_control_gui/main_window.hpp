@@ -72,6 +72,7 @@ public Q_SLOTS:
   void on_btn_actuator_enable_clicked(void);
   void on_btn_actuator_disable_clicked(void);
   void on_btn_get_manipulator_setting_clicked(void);
+  void on_btn_switching_kinematics_setting_clicked(void);
   void on_radio_drawing_line_clicked(void);
   void on_radio_drawing_circle_clicked(void);
   void on_radio_drawing_rhombus_clicked(void);

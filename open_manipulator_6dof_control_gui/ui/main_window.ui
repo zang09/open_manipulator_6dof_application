@@ -495,7 +495,7 @@
    </widget>
    <widget class="QTabWidget" name="tabWidget">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>
@@ -506,7 +506,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>4</number>
     </property>
     <widget class="QWidget" name="tab_js">
      <property name="contextMenuPolicy">
@@ -1824,13 +1824,29 @@
       <property name="geometry">
        <rect>
         <x>40</x>
-        <y>60</y>
+        <y>30</y>
         <width>311</width>
         <height>51</height>
        </rect>
       </property>
       <property name="text">
        <string>Get Manipulator Setting</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_switching_kinematics_setting">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>100</y>
+        <width>311</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Switching Kinematics Setting</string>
       </property>
      </widget>
     </widget>
