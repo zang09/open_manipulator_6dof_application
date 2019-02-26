@@ -112,7 +112,7 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
       if(send_flag)
       {
         sendJointAngle(-PI/2, -0.6, 1.52, 0.0, 1.82, 0.0, 2.0);
-        sendGripperAngle(0.003);  //0.005
+        sendGripperAngle(0.003);
         if(open_manipulator_is_moving_)
           send_flag = false;
       }
@@ -176,7 +176,7 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
 
         sendPanTiltFromPresent(-(temp_camera_x-goal_camera_x)*D2R/5.0, (temp_camera_y-goal_camera_y)*D2R/8.0);
 
-        if(abs(temp_camera_x - goal_camera_x) < 1.0 && abs(temp_camera_y - goal_camera_y) < 1.0) //1.0
+        if(abs(temp_camera_x - goal_camera_x) < 1.0 && abs(temp_camera_y - goal_camera_y) < 1.0)
         {
           motionWait(1.5);
           motion_case = READY_TO_PICKUP;
@@ -224,7 +224,6 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
       }
       else if(!open_manipulator_is_moving_)
       {
-        //sendJointFromPresent(JOINT5, -0.05, 0.5);
         motionWait(0.5);
         sendGripperAngle(-0.01);
         send_flag = true;
@@ -278,7 +277,6 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
     case MODE_PUTDOWN:
       if(send_flag)
       {
-        //DOWN
         if(motion_cnt == 1+4*(layer_cnt-1))
           sendPoseFromPresent(0, 0, -0.085+0.030*(layer_cnt-1));
         else if(motion_cnt == 2+4*(layer_cnt-1))
@@ -305,7 +303,6 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
     case HOME_POSE2:
       if(send_flag)
       {
-        //UP
         if(motion_cnt == 1+4*(layer_cnt-1))
           sendPoseFromPresent(0, 0, 0.085-0.030*(layer_cnt-1));
         else if(motion_cnt == 2+4*(layer_cnt-1))
@@ -323,7 +320,6 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
       }
       else if(!open_manipulator_is_moving_)
       {
-        //Exceptional
         if(motion_cnt == 9 || motion_cnt == 10)
         {
           sendJointFromPresent(JOINT5, -PI/8, 0.8);
@@ -366,7 +362,7 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
         motionWait(1.0);
         pan_flag = 2;
       }
-      else if(pan_flag == 2)  // Go To Right
+      else if(pan_flag == 2)
       {
         sendJointFromPresent(JOINT1, -2.0*D2R, 0.1);
         if(pan_position_ < -135.0)
@@ -375,7 +371,7 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
           tilt_flag = 1;
         }
       }
-      else if(pan_flag == 3)  // Go To Left
+      else if(pan_flag == 3)
       {
         sendJointFromPresent(JOINT1, 2.0*D2R, 0.1);
         if(pan_position_ > -45.0)
@@ -385,7 +381,7 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
         }
       }
 
-      if(tilt_flag == 1)      //UP
+      if(tilt_flag == 1)
       {
         sendJointFromPresent(JOINT5, -1.5*D2R, 0.1);
         if(tilt_position_ < 100)
@@ -394,7 +390,7 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
           pan_flag = 3;
         }
       }
-      else if(tilt_flag == 2) //DOWN
+      else if(tilt_flag == 2)
       {
         sendJointFromPresent(JOINT5, 1.5*D2R, 0.1);
         if(tilt_position_ >= 110)
@@ -480,18 +476,15 @@ void OpenManipulatorMotion::markerPosCallback(const ar_track_alvar_msgs::AlvarMa
     marker_exist_ = true;
     get_marker_size = msg->markers.size();
 
-    //Scan ID
     for(int i=0; i<get_marker_size; i++)
     {
       if(get_marker_id == msg->markers.at(i).id)
       {
-        //Get Position
         temp_position.push_back(msg->markers.at(i).pose.pose.position.x);
         temp_position.push_back(msg->markers.at(i).pose.pose.position.y);
         temp_position.push_back(msg->markers.at(i).pose.pose.position.z);
         marker_position_ = temp_position;
 
-        //Get Orientation
         Eigen::Quaterniond temp_orientation(msg->markers.at(i).pose.pose.orientation.w, msg->markers.at(i).pose.pose.orientation.x, msg->markers.at(i).pose.pose.orientation.y, msg->markers.at(i).pose.pose.orientation.z);
         marker_orientation_ = temp_orientation;
         break;
@@ -683,9 +676,9 @@ void OpenManipulatorMotion::sendMarkerPose(std::vector<double> position, Eigen::
 
   if(solution_flag == 1)
   {
-    kinematics_pose.push_back(transform_position.at(0) + 0.003);
-    kinematics_pose.push_back(transform_position.at(1) + 0.005);
-    kinematics_pose.push_back(transform_position.at(2) + 0.008);
+    kinematics_pose.push_back(transform_position.at(0) + X1_OFFSET);
+    kinematics_pose.push_back(transform_position.at(1) + Y1_OFFSET);
+    kinematics_pose.push_back(transform_position.at(2) + Z1_OFFSET);
     kinematics_pose.push_back(transform_orientation.w());
     kinematics_pose.push_back(transform_orientation.x());
     kinematics_pose.push_back(transform_orientation.y());
@@ -694,9 +687,9 @@ void OpenManipulatorMotion::sendMarkerPose(std::vector<double> position, Eigen::
   }
   else if(solution_flag == 2)
   {
-    kinematics_pose.push_back(transform_position.at(0) + 0.002);
-    kinematics_pose.push_back(transform_position.at(1) + 0.005);
-    kinematics_pose.push_back(transform_position.at(2) + 0.01);
+    kinematics_pose.push_back(transform_position.at(0) + X2_OFFSET);
+    kinematics_pose.push_back(transform_position.at(1) + Y2_OFFSET);
+    kinematics_pose.push_back(transform_position.at(2) + Z2_OFFSET);
     kinematics_pose.push_back(transform_orientation.w());
     kinematics_pose.push_back(transform_orientation.x());
     kinematics_pose.push_back(transform_orientation.y());
@@ -847,7 +840,7 @@ bool OpenManipulatorMotion::setDrawingTrajectory(std::string name, std::vector<d
 }
 
 Eigen::Quaterniond OpenManipulatorMotion::markerOrientationTransformer(Eigen::Quaterniond marker_orientation)
-{//Transform marker orientation to end effector
+{//Transform marker orientation to end_effector
 
   Eigen::Matrix3d marker_orientation_matrix;
   Eigen::Matrix3d forward_transform_matrix;
@@ -865,15 +858,15 @@ Eigen::Quaterniond OpenManipulatorMotion::markerOrientationTransformer(Eigen::Qu
   forward_transform_matrix = math::convertPitchAngleToRotationMatrix(PI);
   reverse_transform_matrix = math::convertRollAngleToRotationMatrix(PI);
 
-  forward_desired_orientation_matrix = marker_orientation_matrix*forward_transform_matrix; // End effector orientation
-  reverse_desired_orientation_matrix = marker_orientation_matrix*reverse_transform_matrix; // Rotate End effector orientation by YawAngle 3.14
+  forward_desired_orientation_matrix = marker_orientation_matrix*forward_transform_matrix;
+  reverse_desired_orientation_matrix = marker_orientation_matrix*reverse_transform_matrix;
 
   //Solve
   transform_marker_orientation_matrix = orientationSolver(forward_desired_orientation_matrix, reverse_desired_orientation_matrix, kinematics_orientation_matrix_);
 
   //Result
   transform_marker_orientation_rpy = math::convertRotationMatrixToRPYVector(transform_marker_orientation_matrix);
-  transform_marker_orientation = math::convertRPYToQuaternion(transform_marker_orientation_rpy.coeff(0,0), transform_marker_orientation_rpy.coeff(1,0), transform_marker_orientation_rpy.coeff(2,0));
+  transform_marker_orientation = math::convertRPYToQuaternion(transform_marker_orientation_rpy.coeff(0,0)+ROLL_OFFSET, transform_marker_orientation_rpy.coeff(1,0)+PITCH_OFFSET, transform_marker_orientation_rpy.coeff(2,0)+YAW_OFFSET);
 
   return transform_marker_orientation;
 }
@@ -895,13 +888,11 @@ Eigen::Matrix3d OpenManipulatorMotion::orientationSolver(Eigen::Matrix3d desired
   if(solution1_value < solution2_value)
   {
     solution_flag = 1;
-    std::cout << "solution1" << std::endl;
     return desired_orientation1;
   }
   else
   {
     solution_flag = 2;
-    std::cout << "solution2" << std::endl;
     return desired_orientation2;
   }
 }
