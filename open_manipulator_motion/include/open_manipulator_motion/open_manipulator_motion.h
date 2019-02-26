@@ -43,6 +43,9 @@
 #define  MODE_SUCCESS_MOTION   200
 #define  MODE_END              1000
 
+#define  R2D                   180/M_PI
+#define  D2R                   M_PI/180
+
 namespace open_manipulator_motion
 {
 
@@ -97,8 +100,7 @@ public:
 
   // ROS NodeHandle
   ros::NodeHandle node_handle_;
-
-  ros::Timer      motion_timer;
+  ros::Timer      motion_timer_;
 
   void initPublisher();
   void initSubscriber();

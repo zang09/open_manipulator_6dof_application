@@ -70,9 +70,9 @@ void OpenManipulatorMotion::initValue()
   pan_flag      = 1;
   tilt_flag     = 0;
   solution_flag = 0;
-  motion_case   = HOME_POSE2;  //INIT_POSE
-  motion_cnt    = 10;   //MOTION_NUM
-  layer_cnt     = 3; //LAYER_NUM
+  motion_case   = INIT_POSE;    
+  motion_cnt    = MOTION_NUM;   
+  layer_cnt     = LAYER_NUM;    
   repeat_motion_cnt = 0;
 }
 
@@ -111,7 +111,7 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
     case INIT_POSE:
       if(send_flag)
       {
-        sendJointAngle(-PI/2, -0.6, 1.52, 0.0, 2.0, 0.0, 2.0);
+        sendJointAngle(-PI/2, -0.6, 1.52, 0.0, 1.82, 0.0, 2.0);
         sendGripperAngle(0.003);  //0.005
         if(open_manipulator_is_moving_)
           send_flag = false;
@@ -186,9 +186,10 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
         get_marker_id = marker_id_;
       break;
 
+
     case READY_TO_PICKUP:
       if(send_flag)
-      {        
+      {
         temp_position = marker_position_;
         temp_orientation = markerOrientationTransformer(marker_orientation_);
         sendMarkerPose(temp_position, temp_orientation, 0, 0, -0.035);
@@ -217,7 +218,7 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
     case MODE_PICKUP:
       if(send_flag)
       {
-        sendEndEffectorFromPresent(temp_orientation, 0.038);
+        sendEndEffectorFromPresent(temp_orientation, 0.035);
         if(open_manipulator_is_moving_)
           send_flag = false;
       }
@@ -236,7 +237,7 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
     case HOME_POSE:
       if(send_flag)
       {
-        sendEndEffectorFromPresent(temp_orientation, -0.038);
+        sendEndEffectorFromPresent(temp_orientation, -0.045);
         if(open_manipulator_is_moving_)
           send_flag = false;
       }
@@ -361,13 +362,13 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
 
       if(pan_flag == 1)
       {
-        sendJointAngle(-PI/2, -0.6, 1.52, 0.0, 2.0, 0.0, 1.5);
+        sendJointAngle(-PI/2, -0.6, 1.52, 0.0, 1.82, 0.0, 1.5);
         motionWait(1.0);
         pan_flag = 2;
       }
       else if(pan_flag == 2)  // Go To Right
       {
-        sendJointFromPresent(JOINT1, -2.5*D2R, 0.1);
+        sendJointFromPresent(JOINT1, -2.0*D2R, 0.1);
         if(pan_position_ < -135.0)
         {
           pan_flag = 0;
@@ -376,7 +377,7 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
       }
       else if(pan_flag == 3)  // Go To Left
       {
-        sendJointFromPresent(JOINT1, 2.5*D2R, 0.1);
+        sendJointFromPresent(JOINT1, 2.0*D2R, 0.1);
         if(pan_position_ > -45.0)
         {
           pan_flag = 0;
@@ -440,9 +441,9 @@ void OpenManipulatorMotion::timerCallback(const ros::TimerEvent&)
 
     case MODE_SUCCESS_MOTION:
       if(send_flag)
-      {        
+      {
         optionPublisher("switching_kinematics");
-        sendDrawingTrajectory(0.08, 2.0, 0.0, 3.0);        
+        sendDrawingTrajectory(0.08, 2.0, 0.0, 3.0);
         send_flag = false;
       }
       else if(!open_manipulator_is_moving_)
@@ -523,11 +524,11 @@ void OpenManipulatorMotion::buttonStatesCallback(const std_msgs::Bool::ConstPtr 
 
   if(motion_flag)
   {
-    motion_timer.start();
+    motion_timer_.start();
     initValue();
   }
   else
-    motion_timer.stop();
+    motion_timer_.stop();
 }
 
 void OpenManipulatorMotion::jointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg)
@@ -682,9 +683,9 @@ void OpenManipulatorMotion::sendMarkerPose(std::vector<double> position, Eigen::
 
   if(solution_flag == 1)
   {
-    kinematics_pose.push_back(transform_position.at(0) + 0.002);
-    kinematics_pose.push_back(transform_position.at(1) + 0.002);
-    kinematics_pose.push_back(transform_position.at(2) + 0.005);
+    kinematics_pose.push_back(transform_position.at(0) + 0.003);
+    kinematics_pose.push_back(transform_position.at(1) + 0.005);
+    kinematics_pose.push_back(transform_position.at(2) + 0.008);
     kinematics_pose.push_back(transform_orientation.w());
     kinematics_pose.push_back(transform_orientation.x());
     kinematics_pose.push_back(transform_orientation.y());
@@ -694,7 +695,7 @@ void OpenManipulatorMotion::sendMarkerPose(std::vector<double> position, Eigen::
   else if(solution_flag == 2)
   {
     kinematics_pose.push_back(transform_position.at(0) + 0.002);
-    kinematics_pose.push_back(transform_position.at(1));
+    kinematics_pose.push_back(transform_position.at(1) + 0.005);
     kinematics_pose.push_back(transform_position.at(2) + 0.01);
     kinematics_pose.push_back(transform_orientation.w());
     kinematics_pose.push_back(transform_orientation.x());
@@ -839,7 +840,7 @@ bool OpenManipulatorMotion::setDrawingTrajectory(std::string name, std::vector<d
     srv.request.param.push_back(arg.at(i));
 
   if(goal_drawing_trajectory_client_.call(srv))
-  {    
+  {
     return srv.response.is_planned;
   }
   return false;
@@ -872,7 +873,7 @@ Eigen::Quaterniond OpenManipulatorMotion::markerOrientationTransformer(Eigen::Qu
 
   //Result
   transform_marker_orientation_rpy = math::convertRotationMatrixToRPYVector(transform_marker_orientation_matrix);
-  transform_marker_orientation = math::convertRPYToQuaternion(transform_marker_orientation_rpy.coeff(0,0), transform_marker_orientation_rpy.coeff(1,0)+0.03, transform_marker_orientation_rpy.coeff(2,0));
+  transform_marker_orientation = math::convertRPYToQuaternion(transform_marker_orientation_rpy.coeff(0,0), transform_marker_orientation_rpy.coeff(1,0), transform_marker_orientation_rpy.coeff(2,0));
 
   return transform_marker_orientation;
 }
@@ -894,13 +895,13 @@ Eigen::Matrix3d OpenManipulatorMotion::orientationSolver(Eigen::Matrix3d desired
   if(solution1_value < solution2_value)
   {
     solution_flag = 1;
-    //std::cout << "solution1" << std::endl;
+    std::cout << "solution1" << std::endl;
     return desired_orientation1;
   }
   else
   {
     solution_flag = 2;
-    //std::cout << "solution2" << std::endl;
+    std::cout << "solution2" << std::endl;
     return desired_orientation2;
   }
 }
@@ -920,8 +921,8 @@ int main(int argc, char **argv)
 
   ROS_INFO("OpenManipulator Motion Node");
 
-  om_motion.motion_timer = n.createTimer(ros::Duration(0.05), &OpenManipulatorMotion::timerCallback, &om_motion);
-  om_motion.motion_timer.stop();
+  om_motion.motion_timer_ = n.createTimer(ros::Duration(0.05), &OpenManipulatorMotion::timerCallback, &om_motion);
+  om_motion.motion_timer_.stop();
 
   ros::spin();
   return 0;
