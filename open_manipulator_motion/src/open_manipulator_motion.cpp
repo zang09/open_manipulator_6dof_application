@@ -13,11 +13,23 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *******************************************************************************/
+
+/* Authors: Hae-Bum Jung */
+
+/*****************************************************************************
+** Includes
+*****************************************************************************/
 #include "open_manipulator_motion/open_manipulator_motion.h"
 
+/*****************************************************************************
+** Namespaces
+*****************************************************************************/
 using namespace open_manipulator_motion;
 using namespace robotis_manipulator;
 
+/*****************************************************************************
+** Implementation
+*****************************************************************************/
 OpenManipulatorMotion::OpenManipulatorMotion()
   :node_handle_("")
 {
