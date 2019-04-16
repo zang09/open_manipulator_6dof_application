@@ -5,7 +5,7 @@
 - [Video for OpenManipulator SARA]()
 
 
-## How to use this application like video above?
+# How to use this application like video above?
 
 ## [1. Install ROS Packages](#install-ros-packages)
 Install dependent packages for OpenManipulator SARA. Run the following command in a terminal window.
@@ -37,7 +37,7 @@ If the catkin_make command has been completed without any errors, all the prepar
 ### [Realsense D435](#realsense-d435)
 
 #### Overview
-![](/assets/images/platform/openmanipulator_x/OpenManipulator_camera_Realsense_D435.png)  
+![](/images/camera/Realsense_D435.png)  
 
 The [Intel® RealSense™ Depth Camera D435](https://realsense.intel.com/depth-camera/#D415_D435) is a USB-powered depth camera and consists of a pair of depth sensors, RGB sensor, and infrared projector. It is ideal for makers and developers to add depth perception capability to their prototype development. The D435 is designed to best fit your prototype.
 
