@@ -52,12 +52,12 @@
 #define  JOINT5                4
 #define  JOINT6                5
 
-#define  X1_OFFSET             0.003
-#define  Y1_OFFSET             0.005
-#define  Z1_OFFSET             0.008
-#define  X2_OFFSET             0.002
-#define  Y2_OFFSET             0.005
-#define  Z2_OFFSET             0.010
+#define  X1_OFFSET             0.0
+#define  Y1_OFFSET             0.0
+#define  Z1_OFFSET             0.0
+#define  X2_OFFSET             0.0
+#define  Y2_OFFSET             0.0
+#define  Z2_OFFSET             0.0
 
 #define  ROLL_OFFSET           0.0
 #define  PITCH_OFFSET          0.0

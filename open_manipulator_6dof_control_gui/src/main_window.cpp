@@ -59,7 +59,7 @@ MainWindow::~MainWindow() {}
 void MainWindow::timerCallback()
 {
   std::vector<double> joint_angle = qnode.getPresentJointAngle();
-  if(joint_angle.size() != 7) //5
+  if(joint_angle.size() != 7)
     return;
 
   ui.txt_j1->setText(QString::number(joint_angle.at(0),'f', 3));
@@ -106,12 +106,12 @@ void MainWindow::timerCallback()
 
 void MainWindow::tabSelected()
 {
-//  if(ui.tabWidget->currentIndex()==0)
-//    on_btn_read_joint_angle_clicked();
-//  if(ui.tabWidget->currentIndex()==1)
-//    on_btn_read_kinematic_pose_clicked();
-//  if(ui.tabWidget->currentIndex()==2)
-//    on_btn_home_pose_clicked();
+  if(ui.tabWidget->currentIndex()==0)
+    on_btn_read_joint_angle_clicked();
+  if(ui.tabWidget->currentIndex()==1)
+    on_btn_read_kinematic_pose_clicked();
+  if(ui.tabWidget->currentIndex()==2)
+    on_btn_home_pose_clicked();
 }
 
 void MainWindow::writeLog(QString str)
@@ -493,9 +493,9 @@ void MainWindow::on_btn_control_back_clicked(void)
 void MainWindow::on_btn_control_init_pos_clicked(void)
 {
   std::vector<double> kinematics_pose;
-  kinematics_pose.push_back(0.16);   //x
-  kinematics_pose.push_back(0.0);    //y
-  kinematics_pose.push_back(0.25);   //z
+  kinematics_pose.push_back(0.16);
+  kinematics_pose.push_back(0.0);
+  kinematics_pose.push_back(0.25);
   qnode.setTaskSpacePathPositionOnly(kinematics_pose, 2.0);
   writeLog("Send Position Init");
 }

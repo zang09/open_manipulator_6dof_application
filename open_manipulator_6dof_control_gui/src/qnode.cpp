@@ -215,10 +215,10 @@ bool QNode::setJointSpacePathToKinematicsPose(std::vector<double> kinematics_pos
   srv.request.kinematics_pose.pose.position.y = kinematics_pose.at(1);
   srv.request.kinematics_pose.pose.position.z = kinematics_pose.at(2);
 
-  srv.request.kinematics_pose.pose.orientation.w = kinematics_pose.at(3); //kinematics_pose_.pose.orientation.w;
-  srv.request.kinematics_pose.pose.orientation.x = kinematics_pose.at(4); //kinematics_pose_.pose.orientation.x;
-  srv.request.kinematics_pose.pose.orientation.y = kinematics_pose.at(5); //kinematics_pose_.pose.orientation.y;
-  srv.request.kinematics_pose.pose.orientation.z = kinematics_pose.at(6); //kinematics_pose_.pose.orientation.z;
+  srv.request.kinematics_pose.pose.orientation.w = kinematics_pose.at(3);
+  srv.request.kinematics_pose.pose.orientation.x = kinematics_pose.at(4);
+  srv.request.kinematics_pose.pose.orientation.y = kinematics_pose.at(5);
+  srv.request.kinematics_pose.pose.orientation.z = kinematics_pose.at(6);
 
   srv.request.path_time = path_time;
 
