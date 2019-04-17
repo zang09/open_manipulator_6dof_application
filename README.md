@@ -5,8 +5,6 @@
 - [Video for OpenManipulator SARA]()
 
 
-# How to use this application like video above?
-
 ## [1. Install ROS Packages](#install-ros-packages)
 Install dependent packages for OpenManipulator SARA. Run the following command in a terminal window.
 
@@ -25,24 +23,23 @@ $ git clone https://github.com/ROBOTIS-GIT/open_manipulator_msgs.git
 $ git clone https://github.com/zang09/open_manipulator_friends.git
 $ git clone https://github.com/zang09/open_manipulator_6dof_simulations.git
 $ git clone https://github.com/zang09/open_manipulator_6dof_application.git
-$ git clone https://github.com/zang09/open_manipulator_perceptions.git
 $ git clone https://github.com/ROBOTIS-GIT/robotis_manipulator.git
 $ cd ~/catkin_ws && catkin_make
 ```
 
 If the catkin_make command has been completed without any errors, all the preparations for using OpenManipulator SARA are done.
 
+
 ## [2. Install Camera Packages](#install-camera-packages)
 
 ### [Realsense D435](#realsense-d435)
 
 #### Overview
-![](/images/camera/Realsense_D435.png)  
+![](/images/camera/Realsense_D435.png)
 
 The [Intel® RealSense™ Depth Camera D435](https://realsense.intel.com/depth-camera/#D415_D435) is a USB-powered depth camera and consists of a pair of depth sensors, RGB sensor, and infrared projector. It is ideal for makers and developers to add depth perception capability to their prototype development. The D435 is designed to best fit your prototype.
 
 #### Specifications
-
 | Items                                | Specifications                        |
 |:-------------------------------------|:--------------------------------------|
 | Use Environment                      | Indoor/Outdoor                        |
@@ -80,5 +77,94 @@ You can use RViz or image_view to verify driver. You can select data topic name 
   ```
 
 #### Reference
-- [Intel® RealSense™ Depth Camera D435](https://realsense.intel.com/depth-camera/#D415_D435)    
+- [Intel® RealSense™ Depth Camera D435](https://realsense.intel.com/depth-camera/#D415_D435)
 - [Realsense ROS package](https://github.com/intel-ros/realsense)
+
+
+## [3. Install AR Marker Packages](#install-ar-marker-packages)
+
+{% capture notice_01 %}
+**NOTE**:
+- This instructions were tested on `Ubuntu 16.04` and `ROS Kinetic Kame`.
+- The `open_manipulator_perceptions` package requires [`ar_track_alvar`](http://wiki.ros.org/ar_track_alvar) package.
+- Make sure to run the [OpenManipulator controller](/docs/en/platform/openmanipulator_x/ros_controller_package/#launch-controller) instructions before running the instructions below.
+{% endcapture %}
+<div class="notice--info">{{ notice_01 | markdownify }}</div>
+
+### Downlaods AR Marker
+If you use the `ar_track_alvar` package to recognize the ar marker, print out the ar marker [here](http://wiki.ros.org/ar_track_alvar).
+
+### Installation
+{% capture notice_01 %}
+**NOTE**:
+- To use the **Raspberry Pi Camera V2**, install it on the **Remote PC**
+{% endcapture %}
+<div class="notice--info">{{ notice_01 | markdownify }}</div>
+
+  ``` bash
+  $ sudo apt-get install ros-kinetic-ar-track-alvar ros-kinetic-ar-track-alvar-msgs ros-kinetic-image-proc
+  ```
+  ``` bash
+  $ cd ~/catkin_ws/src
+  $ git clone https://github.com/zang09/open_manipulator_perceptions.git
+  $ cd ~/catkin_ws && catkin_make
+  ```
+
+### Execution
+You have to change the parameters according to the type of camera. Run the following command.
+
+### Realsense D435
+{% capture notice_01 %}
+**NOTE**:
+- [Realsense D435 ROS package](#realsense-d435) must be installed.
+{% endcapture %}
+<div class="notice--info">{{ notice_01 | markdownify }}</div>
+
+  ``` bash
+  $ roslaunch open_manipulator_ar_markers ar_pose.launch camera_model:=realsense_d435
+  ```
+
+## [4. Launch Controller](#launch-controller)
+Please, open the terminal window, run roscore as entering following command.
+
+``` bash
+$ roscore
+```
+
+After run roscore, open the other terminal window and enter the following commands in the terminal.
+
+**NOTE**: Choose either `Controller` or `Simulation Controller` to launch your controller.
+ 
+### 1.1. Controller
+``` bash
+$ roslaunch open_manipulator_6dof_controller open_manipulator_6dof_controller.launch
+```
+
+### 1.2. Simulation Controller
+``` bash
+$ roslaunch open_manipulator_6dof_controller open_manipulator_6dof_controller.launch use_platform:=false
+$ roslaunch open_manipulator_6dof_gazebo open_manipulator_6dof_gazebo.launch
+```
+
+
+## [5. Launch Application](#launch-application)
+After run controller, launch GUI program to manipulate OpenManipulator SARA.
+
+``` bash
+$ roslaunch open_manipulator_6dof_control_gui open_manipulator_6dof_control_gui.launch
+```
+
+Run the following command to use camera.
+
+``` bash
+$ roslaunch open_manipulator_ar_markers ar_pose.launch
+```
+
+Finally, launch the `motion` node to perform the demonstration in the video.
+
+``` bash
+$ roslaunch open_manipulator_motion open_manipulator_motion.launch
+```
+
+When you ready, click the `START` button in the [Motion]{: .popup}
+![](/images/GUI/GUI_motion.png)
