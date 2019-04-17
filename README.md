@@ -104,15 +104,14 @@ If you use the `ar_track_alvar` package to recognize the ar marker, print out th
   ```
 
 ### Execution
-You have to change the parameters according to the type of camera. Run the following command.
 
-### Realsense D435
-**NOTE**:
-- [Realsense D435 ROS package](#realsense-d435) must be installed.
+#### [Realsense D435]
+  **NOTE**:
+  - [Realsense D435 ROS package](#realsense-d435) must be installed.
 
-  ``` bash
-  $ roslaunch open_manipulator_ar_markers ar_pose.launch camera_model:=realsense_d435
-  ```
+    ``` bash
+    $ roslaunch open_manipulator_ar_markers ar_pose.launch camera_model:=realsense_d435
+    ```
 
 ## [4. Launch Controller](#launch-controller)
 Please, open the terminal window, run roscore as entering following command.
@@ -156,5 +155,140 @@ Finally, launch the `motion` node to perform the demonstration in the video.
 $ roslaunch open_manipulator_motion open_manipulator_motion.launch
 ```
 
-When you ready, click the `START` button in the [Motion]
+When you ready, click the `START` button in the [Motion].
 ![](/images/GUI/GUI_motion.png)
+
+
+## [Teleoperation](#teleoperation)
+**NOTE**:
+- This instruction has been tested on `Ubuntu 16.04` and `ROS Kinetic Kame`.
+- This instruction is supposed to be run on PC with ROS packages installed in. Please run the instruction below on your PC ROS packages installed in.
+
+### [Keyboard](#keyboard)
+**TIP**: The terminal application can be found with the Ubuntu search icon on the top left corner of the screen. Shortcut key for terminal is `Ctrl`+`Alt`+`t`.
+
+  Launch `open_manipulator_6dof_teleop_keyboard` node for simple teleoperation test using the keyboard.
+
+  ``` bash
+  $ roslaunch open_manipulator_6dof_teleop open_manipulator_6dof_teleop_keyboard.launch
+  ```
+
+  If the node is successfully launched, the following instruction will appeare in the terminal window.
+
+  ```
+  ---------------------------
+  Control Your OpenManipulator!
+  ---------------------------
+  w : increase x axis in task space
+  s : decrease x axis in task space
+  a : increase y axis in task space
+  d : decrease y axis in task space
+  z : increase z axis in task space
+  x : decrease z axis in task space
+
+  y : increase joint 1 angle
+  h : decrease joint 1 angle
+  u : increase joint 2 angle
+  j : decrease joint 2 angle
+  i : increase joint 3 angle
+  k : decrease joint 3 angle
+  o : increase joint 4 angle
+  l : decrease joint 4 angle
+  p : increase joint 5 angle
+  ; : decrease joint 5 angle
+  [ : increase joint 6 angle
+  ] : decrease joint 6 angle
+
+  g : gripper open
+  f : gripper close
+       
+  1 : init pose
+  2 : home pose
+       
+  q to quit
+  ---------------------------
+  Present Joint Angle J1: 0.000 J2: 0.000 J3: 0.000 J4: 0.000 J5: 0.000 J6: 0.000
+  Present Kinematics Position X: 0.000 Y: 0.000 Z: 0.000
+  ---------------------------
+  ```
+
+### [PS4 Joystick](#ps4-joystick)
+Install packages for teleoperation using PS4 joystick.
+
+``` bash
+$ sudo apt-get install ros-kinetic-joy ros-kinetic-joystick-drivers ros-kinetic-teleop-twist-joy
+$ sudo pip install ds4drv
+```
+
+Connect PS4 joystick to the PC via Bluetooth using the following command
+
+``` bash
+$ sudo ds4drv
+```
+
+Enter pairing mode with PS4 by pressing and holding Playstation button + share button for 10 sec. If the light on PS4 turns blue, enter the following commands in terminal and control OpenManipulator.
+
+``` bash
+$ export ROS_NAMESPACE=/open_manipulator_6dof
+$ roslaunch teleop_twist_joy teleop.launch
+
+$ roslaunch open_manipulator_6dof_teleop open_manipulator_6dof_teleop_joystick.launch
+```
+
+### [XBOX 360 Joystick](#xbox-360-joystick)
+Install packages for teleoperation using XBOX 360 joystick.
+
+``` bash
+$ sudo apt-get install xboxdrv ros-kinetic-joy ros-kinetic-joystick-drivers ros-kinetic-teleop-twist-joy
+```
+Connect XBOX 360 joystick to the PC with Wireless Adapter or USB cable, and launch teleoperation packages for XBOX 360 joystick.
+
+``` bash
+$ sudo xboxdrv --silent
+
+$ export ROS_NAMESPACE=/open_manipulator_6dof
+$ roslaunch teleop_twist_joy teleop.launch
+
+$ roslaunch open_manipulator_6dof_teleop open_manipulator_6dof_teleop_joystick.launch
+```
+
+
+## [MoveIt!](#moveit)
+**TIP**: The terminal application can be found with the Ubuntu search icon on the top left corner of the screen. Shortcut key for terminal is `Ctrl`+`Alt`+`t`.
+
+Before you launch controller using MoveIt!, check `open_manipulator_6dof_controller` launch file in `open_manipulator_6dof_controller` package.
+
+  ```
+  <launch>
+    <arg name="use_robot_name"         default="open_manipulator_6dof"/>
+
+    <arg name="dynamixel_usb_port"     default="/dev/ttyACM0"/>
+    <arg name="dynamixel_baud_rate"    default="1000000"/>
+
+    <arg name="control_period"         default="0.010"/>
+
+    <arg name="use_platform"           default="true"/>
+
+    <arg name="use_moveit"             default="false"/>
+    <arg name="planning_group_name"    default="arm"/>
+
+    <group if="$(arg use_moveit)">
+      <include file="$(find open_manipulator_6dof_controller)/launch/open_manipulator_6dof_moveit.launch">
+      </include>
+    </group>
+
+    <node name="$(arg use_robot_name)" pkg="open_manipulator_6dof_controller" type="open_manipulator_6dof_controller" output="screen" args="$(arg dynamixel_usb_port) $(arg dynamixel_baud_rate)">
+        <param name="using_platform"       value="$(arg use_platform)"/>
+        <param name="using_moveit"         value="$(arg use_moveit)"/>
+        <param name="planning_group_name"  value="$(arg planning_group_name)"/>
+        <param name="control_period"       value="$(arg control_period)"/>
+    </node>
+
+  </launch>
+  ```
+
+After set the parameters, launch the open_manipulator_6dof_controller.
+
+  ``` bash
+  $ roslaunch open_manipulator_6dof_controller open_manipulator_6dof_controller.launch use_moveit:=true
+  ```
