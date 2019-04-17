@@ -4,7 +4,7 @@
 ## Videos related to open_manipulator_6dof_application
 - [Video for OpenManipulator SARA]()
 
-
+## How to launch demonstration?
 ## [1. Install ROS Packages](#install-ros-packages)
 Install dependent packages for OpenManipulator SARA. Run the following command in a terminal window.
 
@@ -82,24 +82,17 @@ You can use RViz or image_view to verify driver. You can select data topic name 
 
 
 ## [3. Install AR Marker Packages](#install-ar-marker-packages)
-
-{% capture notice_01 %}
 **NOTE**:
 - This instructions were tested on `Ubuntu 16.04` and `ROS Kinetic Kame`.
 - The `open_manipulator_perceptions` package requires [`ar_track_alvar`](http://wiki.ros.org/ar_track_alvar) package.
 - Make sure to run the [OpenManipulator controller](/docs/en/platform/openmanipulator_x/ros_controller_package/#launch-controller) instructions before running the instructions below.
-{% endcapture %}
-<div class="notice--info">{{ notice_01 | markdownify }}</div>
 
 ### Downlaods AR Marker
 If you use the `ar_track_alvar` package to recognize the ar marker, print out the ar marker [here](http://wiki.ros.org/ar_track_alvar).
 
 ### Installation
-{% capture notice_01 %}
 **NOTE**:
 - To use the **Raspberry Pi Camera V2**, install it on the **Remote PC**
-{% endcapture %}
-<div class="notice--info">{{ notice_01 | markdownify }}</div>
 
   ``` bash
   $ sudo apt-get install ros-kinetic-ar-track-alvar ros-kinetic-ar-track-alvar-msgs ros-kinetic-image-proc
@@ -114,11 +107,8 @@ If you use the `ar_track_alvar` package to recognize the ar marker, print out th
 You have to change the parameters according to the type of camera. Run the following command.
 
 ### Realsense D435
-{% capture notice_01 %}
 **NOTE**:
 - [Realsense D435 ROS package](#realsense-d435) must be installed.
-{% endcapture %}
-<div class="notice--info">{{ notice_01 | markdownify }}</div>
 
   ``` bash
   $ roslaunch open_manipulator_ar_markers ar_pose.launch camera_model:=realsense_d435
@@ -147,7 +137,7 @@ $ roslaunch open_manipulator_6dof_gazebo open_manipulator_6dof_gazebo.launch
 ```
 
 
-## [5. Launch Application](#launch-application)
+## [5. Launch Applications](#launch-applications)
 After run controller, launch GUI program to manipulate OpenManipulator SARA.
 
 ``` bash
@@ -166,5 +156,5 @@ Finally, launch the `motion` node to perform the demonstration in the video.
 $ roslaunch open_manipulator_motion open_manipulator_motion.launch
 ```
 
-When you ready, click the `START` button in the [Motion]{: .popup}
+When you ready, click the `START` button in the [Motion]
 ![](/images/GUI/GUI_motion.png)
