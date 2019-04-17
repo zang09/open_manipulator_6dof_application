@@ -1,5 +1,5 @@
 # Open_manipulator_6dof_application
-![](/images/Hardware_1.png)
+![](/images/Hardware_1.PNG)
 
 ## Videos related to open_manipulator_6dof_application
 - [Video for OpenManipulator SARA]()
