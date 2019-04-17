@@ -2,7 +2,7 @@
 ![](/images/Hardware_1.PNG)
 
 ## Videos related to open_manipulator_6dof_application
-- [Video for OpenManipulator SARA]()
+- [Video for OpenManipulator SARA](https://www.youtube.com/watch?v=FexHPbmjwTc)
 
 ## How to launch demonstration?
 ## [1. Install ROS Packages](#install-ros-packages)
