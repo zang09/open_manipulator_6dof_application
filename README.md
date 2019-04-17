@@ -155,7 +155,7 @@ Finally, launch the `motion` node to perform the demonstration in the video.
 $ roslaunch open_manipulator_motion open_manipulator_motion.launch
 ```
 
-When you ready, click the `START` button in the [Motion].
+When you ready, click the `START` button in the `Motion`.
 ![](/images/GUI/GUI_motion.png)
 
 
